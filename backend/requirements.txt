@@ -5,7 +5,7 @@
 # ===========================================
 
 # Django Framework
-Django==5.2.17
+Django==6.1.2
 
 # Django REST Framework (for API)
 djangorestframework==3.17.2
