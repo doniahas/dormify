@@ -97,7 +97,7 @@
     "postcss-flexbugs-fixes": "5.0.2",
     "postcss-normalize": "10.0.1",
     "postcss-preset-env": "11.6.1",
-    "typescript": "5.9.3",
+    "typescript": "7.0.2",
     "vite": "8.2.2",
     "vitest": "4.1.11"
   }
