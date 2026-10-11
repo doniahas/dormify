@@ -22,7 +22,7 @@ django-cors-headers==4.9.0
 python-dotenv==1.2.2
 
 # Excel file processing
-pandas==2.1.4
+pandas==3.0.6
 openpyxl==3.1.5
 
 ortools==9.10.4067
