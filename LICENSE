@@ -1,0 +1,37 @@
+Dormify Source Code Notice
+
+Copyright (c) 2026 Dormify Project Contributors. All rights reserved.
+
+This repository is made publicly viewable for portfolio, academic
+evaluation, research discussion and technical review purposes.
+
+Permission is granted to view and read the source code and documentation
+in this repository for those purposes.
+
+No other permission is granted. Without separate written authorization
+from the relevant rights holder(s), you may not copy, modify, merge,
+publish, distribute, sublicense, sell, deploy, host or commercially
+exploit this software, or create derivative works from it, except to the
+extent that applicable law requires such permission to be available.
+
+"Dormify Project Contributors" means the original project team (Donia
+Hassan, Maha Kadah, Aya Abu-Raya, Zeinab Habiballah and Siraj Sulieman)
+and Donia Hassan for the later, independent Dormify v3 engineering recorded
+in this repository. Nothing in this notice asserts, transfers or waives any
+right that may be held by an institution or another third party, and
+nothing in it should be read as a statement about such rights.
+
+Third-party components are subject to their own licenses, recorded in the
+dependency manifests (backend/requirements.txt, backend/constraints.txt,
+frontend/package.json and frontend/package-lock.json).
+
+Trademarks and logos appearing in this repository, including the Technion
+logo, belong to their respective owners and are not covered by this
+notice. See NOTICE.md.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR RIGHTS HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR ITS
+USE.

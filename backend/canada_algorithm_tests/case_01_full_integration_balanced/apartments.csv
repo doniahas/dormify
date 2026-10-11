@@ -1,0 +1,5 @@
+﻿apartment_code,category,is_active,inactive_reason,is_reserved,is_accessible
+F1,female,TRUE,,FALSE,FALSE
+F2,female,TRUE,,FALSE,FALSE
+M1,male,TRUE,,FALSE,FALSE
+M2,male,TRUE,,FALSE,FALSE

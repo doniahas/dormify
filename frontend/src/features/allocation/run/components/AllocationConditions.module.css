@@ -1,0 +1,244 @@
+/*
+ * Allocation conditions: critical/flexible condition cards, the switch, the
+ * importance slider and the permission lock notice. One module so the
+ * descendant selectors (.apCondHighlight .apCondIconCritical, .apSwitchOn
+ * .apSwitchThumb) keep their original cascade.
+ */
+/* ── Conditions ──────────────────────────── */
+.apCondSection {
+  padding: 16px;
+  border-top: 1px solid var(--ap-border);
+}
+.apCondSectionDivider { border-top: 2px solid var(--ap-border); }
+.apCondSectionHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--ap-border);
+}
+.apCondGrid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.apCondColCritical { color: #0f766e; }
+.apCondColFlexible { color: var(--ap-blue); }
+.apCondColTitle {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ap-text);
+  line-height: 1.2;
+  margin-bottom: 3px;
+}
+.apCondColHint {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ap-muted);
+  line-height: 1.45;
+}
+.apCountBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(15,23,42,0.06);
+  border: 1px solid var(--ap-border);
+  color: var(--ap-muted);
+  font-size: 11px;
+  font-weight: 800;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+/* Condition Cards */
+.apCondCard {
+  border-radius: var(--ap-radius-xs);
+  border: 1px solid var(--ap-border);
+  background: var(--ap-surface-2);
+  padding: 11px 12px;
+  transition: border-color 0.15s;
+}
+.apCondCritical {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  background: linear-gradient(135deg, rgba(15,118,110,0.04), rgba(16,185,129,0.02));
+  border-color: rgba(15,118,110,0.14);
+}
+.apCondFlexible {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.apCondFlexible.apCondOff { opacity: 0.6; background: rgba(15,23,42,0.018); }
+.apCondFlexTop {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+}
+.apCondIconWrap {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.apCondIconCritical {
+  background: rgba(15,118,110,0.09);
+  border: 1px solid rgba(15,118,110,0.16);
+  color: #0f766e;
+}
+.apCondIconFlex {
+  background: var(--ap-blue-soft);
+  border: 1px solid var(--ap-blue-border);
+  color: var(--ap-blue);
+}
+.apCondBody { flex: 1; min-width: 0; }
+.apCondName {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ap-text);
+  line-height: 1.35;
+}
+.apCondDesc {
+  font-size: 11px;
+  color: var(--ap-muted);
+  margin-top: 2px;
+  line-height: 1.4;
+  font-weight: 500;
+}
+.apCondDesc2 { margin-top: 1px; }
+.apCondHighlight {
+  background: linear-gradient(135deg, rgba(217,119,6,0.05), rgba(217,119,6,0.015));
+  border-color: rgba(217,119,6,0.16);
+}
+.apCondHighlight .apCondIconCritical {
+  background: rgba(217,119,6,0.10);
+  border-color: rgba(217,119,6,0.20);
+  color: var(--ap-amber);
+}
+.apCondMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 7px;
+}
+.apCondBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 800;
+  border: 1px solid transparent;
+}
+.apCondBadgeCritical {
+  background: rgba(15,118,110,0.09);
+  border-color: rgba(15,118,110,0.16);
+  color: #0f766e;
+}
+.apCondAlways {
+  font-size: 10.5px;
+  color: var(--ap-muted);
+  font-weight: 600;
+}
+.apCondStatusChip {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 5px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--ap-muted);
+}
+.apCondStatusChip.apCondStatusOn { color: var(--ap-green); }
+/* ── Switch ──────────────────────────────── */
+.apSwitch {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(100,116,139,0.25);
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.18s;
+  margin-top: 1px;
+}
+.apSwitchOn { background: var(--ap-blue); }
+.apSwitch:focus-visible { outline: 3px solid rgba(37,99,235,0.22); outline-offset: 2px; }
+.apSwitchThumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(15,23,42,0.2);
+  transition: transform 0.18s;
+}
+.apSwitchOn .apSwitchThumb { transform: translateX(18px); }
+/* ── Slider ──────────────────────────────── */
+.apCondWeight {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--ap-border);
+}
+.apCondWeightHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+.apCondWeightLbl {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ap-muted);
+}
+.apCondWeightVal {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--ap-text);
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--ap-blue-soft);
+  border: 1px solid var(--ap-blue-border);
+}
+.apRange {
+  width: 100%;
+  accent-color: var(--ap-blue);
+  cursor: pointer;
+  height: 4px;
+}
+.apRange:disabled { cursor: not-allowed; opacity: 0.4; }
+.apRangeScale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3px;
+  font-size: 9.5px;
+  color: var(--ap-muted);
+  font-weight: 700;
+}
+/* ── Lock Notice ─────────────────────────── */
+.apLockNotice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-top: 1px solid var(--ap-border);
+  color: var(--ap-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+@media (max-width: 768px) {
+  .apCondGrid2 { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,401 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - 'refactor/**'
+  push:
+    branches:
+      - main
+      - 'refactor/**'
+
+# A newer commit on the same ref makes an in-flight run obsolete.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Test output and API messages contain Hebrew. Linux runners already
+  # default to UTF-8; setting this explicitly keeps the documented commands
+  # identical on Windows, where the default console encoding otherwise turns
+  # ordinary output into decoding errors that look like test failures.
+  PYTHONIOENCODING: utf-8
+  PYTHONUTF8: '1'
+
+jobs:
+  # ==========================================================================
+  # 1. Static checks - Python lint plus Django system and migration checks.
+  #    No database required, fails within about a minute.
+  # ==========================================================================
+  static-checks:
+    name: Django system and migration checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: backend
+
+    env:
+      # settings.py refuses to start when local-database-only mode is enabled
+      # and DB_HOST is unset, so the database configuration must be present
+      # even though neither command below opens a connection.
+      DEBUG: 'True'
+      DORMIFY_LOCAL_DB_ONLY: 'True'
+      DB_NAME: dormify_test
+      DB_USER: dormify_user
+      DB_PASSWORD: dormify_password
+      DB_HOST: localhost
+      DB_PORT: '5435'
+      DB_SSLMODE: disable
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/constraints.txt
+            backend/requirements-dev.txt
+
+      # Lint runs first: it needs only Ruff, so a lint failure is reported
+      # before the runtime dependencies are installed. The rule set lives in
+      # backend/ruff.toml.
+      - name: Install lint tooling
+        run: pip install -r requirements-dev.txt
+
+      - name: Python lint (Ruff)
+        run: ruff check .
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -c constraints.txt
+
+      - name: Django system check
+        run: python manage.py check
+
+      - name: Migration drift check
+        run: python manage.py makemigrations --check --dry-run
+
+  # ==========================================================================
+  # 2. Mandatory-green backend suites.
+  #    These have no exceptions list: any failure fails the build.
+  # ==========================================================================
+  backend-tests:
+    name: Backend tests (must be green)
+    runs-on: ubuntu-latest
+    needs: static-checks
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: dormify_test
+          POSTGRES_USER: dormify_user
+          # Throwaway credential for an ephemeral service container that is
+          # destroyed with the job and is never reachable from outside it.
+          # Deliberately a literal rather than a repository secret: treating
+          # it as a secret would imply it protects something, and would stop
+          # forks and outside contributors from running this workflow.
+          POSTGRES_PASSWORD: dormify_password
+        ports:
+          # Published on 5435 so the CI command and the documented local
+          # command are identical.
+          - 5435:5432
+        options: >-
+          --health-cmd "pg_isready -U dormify_user -d dormify_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DEBUG: 'True'
+      DORMIFY_LOCAL_DB_ONLY: 'True'
+      DB_NAME: dormify_test
+      DB_USER: dormify_user
+      DB_PASSWORD: dormify_password
+      # The database safety guard accepts an explicit allowlist of local
+      # hosts. Reaching the service through the mapped port on localhost
+      # satisfies it; a container job would reach it as 'postgres', which
+      # does not.
+      DB_HOST: localhost
+      DB_PORT: '5435'
+      # The service serves plaintext connections, so the settings default of
+      # sslmode=require must be overridden or every connection fails.
+      DB_SSLMODE: disable
+      # Single-worker CP-SAT search keeps allocation results reproducible
+      # from run to run.
+      ALLOCATION_NUM_SEARCH_WORKERS: '1'
+
+    steps:
+      # A full checkout is required: one security test asserts on the
+      # repository-root docker-compose.yml, which sits outside backend/.
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/constraints.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -c constraints.txt
+
+      - name: Functional API suite
+        run: python manage.py test api.tests.functional api.tests.characterization --noinput
+
+      - name: Security and authorization suite
+        run: python manage.py test api.tests.security --noinput
+
+      - name: Assisted allocation suite
+        run: python manage.py test api.tests.assisted_allocation --noinput
+
+      # Direct tests of the domain modules (allocation engine boundary,
+      # durable worker, leases, recovery, fencing) and the HTTP contracts of
+      # every frontend-consumed endpoint. Neither family is reached by any
+      # other job, so they are run here explicitly.
+      - name: Domain and API contract suites
+        run: python manage.py test api.tests.domains api.tests.contracts --noinput
+
+      # A test run must not leave anything behind in the checkout. Making
+      # that an explicit assertion keeps it from drifting unnoticed.
+      - name: Assert the working tree is still clean
+        if: always()
+        working-directory: .
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::error::The test run modified the working tree:"
+            git status --porcelain
+            exit 1
+          fi
+          echo "Working tree is clean."
+
+  # ==========================================================================
+  # 3. Allocation regression: the complete allocation suite, in full.
+  #    Every test must pass; any failure or error fails the job.
+  # ==========================================================================
+  allocation-regression:
+    name: Allocation regression (full suite)
+    runs-on: ubuntu-latest
+    needs: static-checks
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: dormify_test
+          POSTGRES_USER: dormify_user
+          POSTGRES_PASSWORD: dormify_password
+        ports:
+          - 5435:5432
+        options: >-
+          --health-cmd "pg_isready -U dormify_user -d dormify_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DEBUG: 'True'
+      DORMIFY_LOCAL_DB_ONLY: 'True'
+      DB_NAME: dormify_test
+      DB_USER: dormify_user
+      DB_PASSWORD: dormify_password
+      DB_HOST: localhost
+      DB_PORT: '5435'
+      DB_SSLMODE: disable
+      ALLOCATION_NUM_SEARCH_WORKERS: '1'
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/constraints.txt
+
+      - name: Install dependencies
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -c constraints.txt
+
+      # The suite runs in full - nothing is filtered or silenced. The script
+      # fails unless every discovered test ran and passed.
+      - name: Allocation suite (every test must pass)
+        # Written outside the checkout so the run leaves no untracked file
+        # behind, and uploaded as an artifact below. Set here rather than at
+        # job level: the runner context is not available to job-level env.
+        env:
+          ALLOCATION_LOG: ${{ runner.temp }}/allocation-suite.log
+        run: bash scripts/ci/run_allocation_suite.sh
+
+      # Uploaded even when the suite fails - that is when it is needed.
+      # Kept ahead of the cleanliness assertion so the log is preserved
+      # whatever else in this job goes wrong.
+      - name: Upload allocation suite log
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: allocation-suite-log
+          path: ${{ runner.temp }}/allocation-suite.log
+          if-no-files-found: warn
+          retention-days: 14
+
+      # The suite log is written outside the checkout, so a normal run leaves
+      # the working tree untouched. Asserting it keeps that true.
+      - name: Assert the working tree is still clean
+        if: always()
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::error::The test run modified the working tree:"
+            git status --porcelain
+            exit 1
+          fi
+          echo "Working tree is clean."
+
+  # ==========================================================================
+  # 4. Performance regression.
+  #    Protects query efficiency: the suite relies primarily on SQL query counts
+  #    and query-growth checks to catch N+1 regressions, with a generous
+  #    wall-clock guard against catastrophic slowdown. Any test failure fails
+  #    the build.
+  # ==========================================================================
+  performance-tests:
+    name: Performance regression (query-count based)
+    runs-on: ubuntu-latest
+    needs: static-checks
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: dormify_test
+          POSTGRES_USER: dormify_user
+          POSTGRES_PASSWORD: dormify_password
+        ports:
+          - 5435:5432
+        options: >-
+          --health-cmd "pg_isready -U dormify_user -d dormify_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DEBUG: 'True'
+      DORMIFY_LOCAL_DB_ONLY: 'True'
+      DB_NAME: dormify_test
+      DB_USER: dormify_user
+      DB_PASSWORD: dormify_password
+      DB_HOST: localhost
+      DB_PORT: '5435'
+      DB_SSLMODE: disable
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/constraints.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -c constraints.txt
+
+      # The suite runs in full. Its human-readable evidence files are optional
+      # diagnostic output that is written only when an output directory is
+      # requested, so leaving DORMIFY_PERF_EVIDENCE_DIR unset here keeps the
+      # run free of output files.
+      - name: Performance suite
+        run: python manage.py test api.tests.performance --noinput
+
+      # The suite must not leave anything behind in the checkout. Making that
+      # an explicit assertion keeps it from drifting unnoticed.
+      - name: Assert the working tree is still clean
+        if: always()
+        working-directory: .
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::error::The test run modified the working tree:"
+            git status --porcelain
+            exit 1
+          fi
+          echo "Working tree is clean."
+
+  # ==========================================================================
+  # 5. Frontend production build.
+  #    Verifies that the committed lockfile installs reproducibly and that the
+  #    React application compiles with CI warning behavior enabled.
+  # ==========================================================================
+  frontend-build:
+    name: Frontend build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '20.20.2'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      # Type-checks the TypeScript sources and the typed boundary of the
+      # JavaScript ones (tsconfig.json: strict, allowJs, checkJs off).
+      - name: Type check
+        working-directory: frontend
+        run: npm run typecheck
+
+      - name: Run frontend unit and component tests
+        working-directory: frontend
+        run: npm test
+
+      - name: Build production frontend
+        env:
+          CI: 'true'
+        working-directory: frontend
+        run: npm run build
+
+      # node_modules/ and build/ are ignored, so this assertion detects only
+      # unexpected tracked or non-ignored output from the install and build.
+      - name: Assert the working tree is still clean
+        if: always()
+        run: |
+          if [ -n "$(git status --porcelain --untracked-files=all)" ]; then
+            echo "::error::The frontend build modified the working tree:"
+            git status --porcelain --untracked-files=all
+            exit 1
+          fi
+          echo "Working tree is clean."

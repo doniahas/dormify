@@ -1,0 +1,65 @@
+/*
+ * Dormify design tokens (R3).
+ *
+ * Every value below was harvested from the styles the pages already use -
+ * the slate text/border palette, the blue primary, the state colours, the
+ * Heebo font stack, the shell dimensions and the radii that recur across the
+ * inline <style> blocks. Nothing here changes how the app looks: the tokens
+ * are the shared vocabulary R4 migrates page styles onto. They are prefixed
+ * `--df-` so they never collide with the page-local custom properties some
+ * pages still declare on :root (--page-bg, --inv-*, --ap-*, ...).
+ */
+:root {
+  /* Typography */
+  --df-font-family: 'Heebo', -apple-system, BlinkMacSystemFont, sans-serif;
+  --df-font-family-mono: 'SF Mono', Consolas, Menlo, monospace;
+
+  /* Surfaces and text (slate scale) */
+  --df-color-page-bg: #f1f5f9;
+  --df-color-surface: #ffffff;
+  --df-color-surface-muted: #f8fafc;
+  --df-color-border: #e2e8f0;
+  --df-color-border-strong: #cbd5e1;
+  --df-color-text: #0f172a;
+  --df-color-text-secondary: #334155;
+  --df-color-text-muted: #475569;
+  --df-color-text-subtle: #64748b;
+  --df-color-text-faint: #94a3b8;
+
+  /* Primary (blue) */
+  --df-color-primary: #2563eb;
+  --df-color-primary-strong: #1d4ed8;
+  --df-color-primary-soft: #eff6ff;
+  --df-color-primary-tint: #dbeafe;
+
+  /* States */
+  --df-color-success: #059669;
+  --df-color-danger: #dc2626;
+  --df-color-danger-strong: #b91c1c;
+  --df-color-danger-soft: #fee2e2;
+  --df-color-warning: #d97706;
+  --df-color-warning-soft: #fef3c7;
+  --df-color-accent: #7c3aed;
+
+  /* Radii */
+  --df-radius-sm: 8px;
+  --df-radius-md: 10px;
+  --df-radius-lg: 12px;
+  --df-radius-xl: 14px;
+  --df-radius-2xl: 16px;
+  --df-radius-pill: 999px;
+
+  /* Elevation */
+  --df-shadow-soft: 0 7px 20px rgba(15, 23, 42, 0.06);
+  --df-shadow: 0 14px 38px rgba(15, 23, 42, 0.08);
+
+  /* App shell */
+  --df-sidebar-width: 260px;
+  --df-sidebar-width-collapsed: 72px;
+  --df-header-height: 64px;
+
+  /* Scrollbars */
+  --df-scrollbar-size: 8px;
+  --df-scrollbar-thumb: #cbd5e1;
+  --df-scrollbar-thumb-hover: #94a3b8;
+}

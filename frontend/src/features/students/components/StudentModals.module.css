@@ -1,0 +1,290 @@
+/*
+ * The Students page modals: Add Request, Add/Edit Student and Assign Bed.
+ * One module so the shared modal chrome (.modalOverlay, .modalContent,
+ * .modalClose, ...) and the per-modal rules keep their original cascade.
+ */
+.spinner { color: #3d9fe0; animation: spin 1s linear infinite; flex-shrink: 0; }
+@keyframes spin {from { transform: rotate(0deg); } to { transform: rotate(360deg); }}
+.mono { font-family: 'SF Mono', Menlo, monospace; }
+.modalOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.modalContent { background: white; border-radius: 18px; width: 92%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.20); }
+.modalContent.wide { max-width: 680px; }
+.modalHeaderModern { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; background: linear-gradient(135deg, var(--df-color-primary-soft) 0%, var(--df-color-surface-muted) 100%); border-bottom: 1px solid #e5e7eb; }
+.modalTitleWrap { display: flex; align-items: center; gap: 12px; }
+.modalIcon { width: 38px; height: 38px; background: linear-gradient(135deg, #3d9fe0, var(--df-color-primary)); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.modalHeaderModern h3 { font-size: 19px; font-weight: 800; color: var(--df-color-text); }
+.modalClose { background: white; border: 1px solid #e5e7eb; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--df-color-text-subtle); cursor: pointer; flex-shrink: 0; }
+.modalClose:hover { background: var(--df-color-page-bg); }
+.modalBody { padding: 22px; }
+.selectedStudentPill { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--df-color-primary-soft); border: 1px solid #bfdbfe; border-radius: 12px; margin-bottom: 20px; }
+.miniAvatar { background: linear-gradient(135deg, #3d9fe0, var(--df-color-primary)); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 16px; }
+.ssName { font-weight: 700; color: var(--df-color-text); font-size: 15px; }
+.ssMeta { font-size: 13px; color: var(--df-color-text-subtle); }
+.formSection { margin-bottom: 18px; }
+.formSection > label { display: block; font-size: 14px; font-weight: 700; color: var(--df-color-text-muted); margin-bottom: 10px; }
+.formSection textarea { width: 100%; padding: 14px; border: 1px solid #e5e7eb; border-radius: 12px; font-family: inherit; font-size: 15px; resize: vertical; outline: none; box-sizing: border-box; }
+.formSection textarea:focus { border-color: #3d9fe0; }
+.typeOptionsModern { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.typeOptionModern { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 8px; border: 2px solid #e5e7eb; background: white; border-radius: 14px; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--df-color-text-muted); cursor: pointer; transition: all 0.15s; }
+.typeOptionModern .optIcon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: var(--df-color-page-bg); color: var(--df-color-text-subtle); }
+.typeOptionModern:hover { border-color: var(--df-color-border-strong); transform: translateY(-1px); }
+.typeOptionModern.active.purple { border-color: var(--df-color-accent); background: #faf5ff; }
+.typeOptionModern.active.purple .optIcon { background: #ede9fe; color: var(--df-color-accent); }
+.typeOptionModern.active.purple span { color: #6d28d9; }
+.typeOptionModern.active.green { border-color: var(--df-color-success); background: #f0fdf4; }
+.typeOptionModern.active.green .optIcon { background: #d1fae5; color: var(--df-color-success); }
+.typeOptionModern.active.green span { color: #047857; }
+.typeOptionModern.active.orange { border-color: #ea580c; background: #fff7ed; }
+.typeOptionModern.active.orange .optIcon { background: #ffedd5; color: #ea580c; }
+.typeOptionModern.active.orange span { color: #c2410c; }
+.typeOptionSpecial { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border: 2px solid #e5e7eb; background: white; border-radius: 12px; font-family: inherit; font-size: 14px; font-weight: 700; color: var(--df-color-text-muted); cursor: pointer; transition: all 0.15s; width: 100%; margin-top: 10px; }
+.typeOptionSpecial.fullWidth { width: 100%; box-sizing: border-box; }
+.typeOptionSpecial .optIconSm { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: var(--df-color-page-bg); color: var(--df-color-text-subtle); flex-shrink: 0; }
+.typeOptionSpecial:hover { border-color: var(--df-color-border-strong); }
+.typeOptionSpecial.active.red { border-color: #ef4444; background: #fef2f2; }
+.typeOptionSpecial.active.red .optIconSm { background: var(--df-color-danger-soft); color: #ef4444; }
+.typeOptionSpecial.active.red span { color: var(--df-color-danger-strong); }
+.typeNote { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; margin-bottom: 16px; }
+.typeNote.red { background: #fef2f2; color: var(--df-color-danger-strong); border: 1px solid #fecaca; }
+.subOptions { display: flex; gap: 10px; flex-wrap: wrap; }
+.subOption { flex: 1; min-width: 100px; padding: 12px 14px; border: 2px solid #e5e7eb; background: white; border-radius: 12px; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--df-color-text-muted); cursor: pointer; transition: all 0.15s; }
+.subOption:hover { border-color: var(--df-color-border-strong); }
+.subOption.active { background: linear-gradient(135deg, var(--df-color-primary-soft), var(--df-color-primary-tint)); border-color: var(--df-color-primary); color: var(--df-color-primary-strong); }
+.msg { padding: 11px 14px; border-radius: 10px; font-size: 14px; margin-bottom: 12px; font-weight: 700; }
+.errorMsg { background: var(--df-color-danger-soft); color: var(--df-color-danger-strong); }
+.successMsg { background: #d1fae5; color: var(--df-color-success); }
+.modalActions { display: flex; gap: 10px; margin-top: 14px; }
+.btnSecondary { flex: 1; padding: 12px; border: 1px solid #e5e7eb; background: white; border-radius: 12px; font-family: inherit; font-weight: 700; color: var(--df-color-text-muted); cursor: pointer; font-size: 15px; }
+.btnPrimary { flex: 1; padding: 12px; border: none; background: linear-gradient(135deg, #3d9fe0, var(--df-color-primary)); color: white; border-radius: 12px; font-family: inherit; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; }
+.btnPrimary.danger { background: linear-gradient(135deg, #f87171, #ef4444); }
+.btnPrimary:disabled, .btnSecondary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btnAssign { flex: 2; padding: 12px; border: none; background: linear-gradient(135deg, #10b981, var(--df-color-success)); color: white; border-radius: 12px; font-family: inherit; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; transition: all 0.15s; }
+.btnAssign:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(5,150,105,0.3); }
+.btnAssign:disabled { opacity: 0.5; cursor: not-allowed; }
+.modalTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.modalSubtitle {
+  margin: 4px 0 0;
+  color: var(--df-color-text-subtle);
+  font-size: 13px;
+  font-weight: 600;
+}
+.modalIcon.blue { background: linear-gradient(135deg, var(--df-color-primary), var(--df-color-primary-strong)); }
+.formAlert {
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.formAlert.error {
+  background: var(--df-color-danger-soft);
+  color: var(--df-color-danger-strong);
+  border: 1px solid #fecaca;
+}
+.formAlert.success {
+  background: #d1fae5;
+  color: #047857;
+  border: 1px solid #86efac;
+}
+.assignStudentMeta { font-size: 14px; color: var(--df-color-text-subtle); font-weight: 700; margin-top: 2px; }
+.currentAssignmentBanner {
+  margin: 0 22px 12px;
+  padding: 12px 16px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cabTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #9a3412;
+}
+.cabNote {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #c2410c;
+}
+.assignRegionScope {
+  margin: 0 22px 12px;
+  padding: 10px 16px;
+  background: var(--df-color-primary-soft);
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.assignRegionScopeLabel { font-size: 13px; font-weight: 800; color: var(--df-color-primary-strong); white-space: nowrap; }
+.assignRegionScope select {
+  flex: 1;
+  border: 1px solid #93c5fd;
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e3a8a;
+  background: white;
+  font-family: inherit;
+}
+.assignRegionScope select:disabled { opacity: 0.6; cursor: not-allowed; }
+.modalContent.xwide { max-width: 1100px; }
+.modalContent.xwide { max-width: 1100px; max-height: 92vh; display: flex; flex-direction: column; }
+.assignModalBody { padding: 16px 22px 0; flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.assignBlockedBox { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 48px 20px; color: var(--df-color-danger-strong); text-align: center; }
+.assignBlockedTitle { font-weight: 800; font-size: 16px; margin: 0; }
+.assignBlockedMsg { font-size: 14px; color: #7f1d1d; margin: 0; max-width: 420px; }
+.assignBlockedEditBtn { display: flex; align-items: center; gap: 6px; margin-top: 8px; border: none; background: var(--df-color-primary-strong); color: white; border-radius: 10px; padding: 10px 20px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.assignBlockedEditBtn:hover { background: #1e40af; }
+.assignActionBar { display: flex; gap: 10px; padding: 14px 22px; border-top: 1px solid #e5e7eb; background: white; position: sticky; bottom: 0; }
+@media (max-width: 560px) {
+  .typeOptionsModern { grid-template-columns: 1fr; }
+}
+.addStudentModal {
+  max-width: 900px;
+  width: 92vw;
+  max-height: 88vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.addStudentModal .modalBody {
+  padding: 24px;
+  overflow-y: auto;
+}
+.addStudentModal .modalHeader {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.addStudentModal .modalHeader h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--df-color-text);
+}
+.addStudentModal .modalSection {
+  margin-bottom: 24px;
+  padding: 18px;
+  background: var(--df-color-surface-muted);
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+}
+.addStudentModal .modalSection h3 {
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--df-color-text);
+}
+.addStudentModal .formGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.addStudentModal label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--df-color-text-secondary);
+}
+.addStudentModal input,
+.addStudentModal select,
+.addStudentModal textarea {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--df-color-border-strong);
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--df-color-text);
+  background: white;
+  outline: none;
+}
+.addStudentModal textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+.addStudentModal input:focus,
+.addStudentModal select:focus,
+.addStudentModal textarea:focus {
+  border-color: var(--df-color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+.addStudentModal select:disabled {
+  background: var(--df-color-page-bg);
+  color: var(--df-color-text-faint);
+  cursor: not-allowed;
+}
+.addStudentModal label.fieldError input,
+.addStudentModal label.fieldError select {
+  border-color: var(--df-color-danger);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+.addStudentModal .fieldErrorMsg {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--df-color-danger);
+}
+.addStudentModal .readonlyRegionBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--df-color-primary-soft);
+  color: var(--df-color-primary-strong);
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.addStudentModal .modalFooter {
+  padding: 18px 24px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: white;
+}
+.addStudentModal .secondaryBtn,
+.addStudentModal .primaryBtn {
+  border: none;
+  border-radius: 12px;
+  padding: 11px 18px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.addStudentModal .secondaryBtn {
+  background: var(--df-color-page-bg);
+  color: var(--df-color-text-secondary);
+}
+.addStudentModal .primaryBtn {
+  background: var(--df-color-primary);
+  color: white;
+}
+.addStudentModal .secondaryBtn:disabled,
+.addStudentModal .primaryBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+@media (max-width: 900px) {
+  .addStudentModal .formGrid { grid-template-columns: 1fr; }
+}

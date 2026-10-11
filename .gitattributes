@@ -1,0 +1,5 @@
+# Shell scripts must keep LF endings in the repository and on checkout.
+# CI runs them on Linux, where a CRLF line ending makes the interpreter fail
+# with an unhelpful "\r: command not found". Pinning this here keeps the
+# guarantee independent of any contributor's local core.autocrlf setting.
+*.sh text eol=lf

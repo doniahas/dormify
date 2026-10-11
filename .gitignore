@@ -1,0 +1,29 @@
+# JetBrains / IDE
+.idea/
+
+# Django local DB
+backend/db.sqlite3
+db.sqlite3
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# React
+node_modules/
+.env
+.env.*
+!.env.example
+
+# Build files
+build/
+dist/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Generated demo data (synthetic student workbooks from backend/scripts/generate_demo_students.py)
+backend/demo-data/

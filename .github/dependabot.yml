@@ -1,0 +1,52 @@
+# Dependabot version updates. Every update arrives as an ordinary pull request
+# that runs the full CI suite and needs a normal review; nothing is merged
+# automatically.
+#
+# Weekly, with minor and patch updates grouped into one pull request per
+# ecosystem, to keep the noise low. Major updates still arrive one by one,
+# because they need individual attention.
+
+version: 2
+
+updates:
+  # Backend: requirements.txt, constraints.txt and requirements-dev.txt.
+  - package-ecosystem: pip
+    directory: /backend
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      backend-minor-and-patch:
+        update-types: [minor, patch]
+
+  # Frontend: package.json and package-lock.json.
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      frontend-minor-and-patch:
+        update-types: [minor, patch]
+
+  # GitHub Actions used by the workflows in .github/workflows.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      github-actions:
+        patterns: ['*']

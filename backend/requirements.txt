@@ -1,0 +1,33 @@
+# ===========================================
+# DORMIFY BACKEND - PYTHON DEPENDENCIES
+# ===========================================
+# Install with: pip install -r requirements.txt -c constraints.txt
+# ===========================================
+
+# Django Framework
+Django==5.2.17
+
+# Django REST Framework (for API)
+djangorestframework==3.17.2
+
+# JWT Authentication
+djangorestframework-simplejwt==5.5.1
+
+
+
+# CORS (allow React to connect)
+django-cors-headers==4.9.0
+
+# Environment Variables
+python-dotenv==1.2.2
+
+# Excel file processing
+pandas==2.1.4
+openpyxl==3.1.5
+
+ortools==9.10.4067
+# Password Hashing (included in Django, but listed for clarity)
+bcrypt==4.1.2
+
+psycopg2-binary==2.9.12
+requests>=2.31,<3

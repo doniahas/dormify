@@ -1,0 +1,86 @@
+/*
+ * Buildings page: the page frame (its --inv-* tokens), header, breadcrumb,
+ * filter bar, summary strip and the two-column workspace. Moved out of
+ * BuildingsPage.jsx's inline <style> block unchanged (R4); scoped by Vite
+ * as a CSS Module.
+ */
+.page {
+  --inv-bg: #f4f5f7;
+  --inv-panel: var(--df-color-surface);
+  --inv-panel-subtle: #f9fafb;
+  --inv-border: #e5e7eb;
+  --inv-border-strong: #d1d5db;
+  --inv-text: #111827;
+  --inv-muted: #6b7280;
+  --inv-primary: var(--df-color-primary);
+  --inv-primary-hover: var(--df-color-primary-strong);
+  --inv-primary-soft: var(--df-color-primary-tint);
+  --inv-success: var(--df-color-success);
+  --inv-success-soft: #d1fae5;
+  --inv-warning: #b45309;
+  --inv-warning-soft: var(--df-color-warning-soft);
+  --inv-danger: var(--df-color-danger);
+  --inv-danger-soft: var(--df-color-danger-soft);
+  --inv-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+  padding: 20px 22px 32px;
+  background: var(--inv-bg);
+  min-height: 100vh;
+  color: var(--inv-text);
+  font-size: 13px;
+}
+.centerFull { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+.pageHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+.pageHeaderLeft { display: flex; align-items: flex-start; gap: 10px; }
+.pageHeaderIcon {
+  width: 36px; height: 36px; border-radius: 10px; background: var(--inv-primary-soft); color: var(--inv-primary);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.pageHeader h1 { font-size: 18px; margin: 0 0 2px; font-weight: 750; }
+.pageHeader p { margin: 0; color: var(--inv-muted); font-size: 12px; }
+.pageHeaderRight { display: flex; align-items: center; gap: 8px; }
+.viewOnlyIndicator {
+  display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 650; color: var(--inv-warning);
+  background: var(--inv-warning-soft); border-radius: 8px; padding: 5px 9px;
+}
+.breadcrumb {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 12px; color: var(--inv-muted);
+  margin-bottom: 12px; padding: 6px 2px;
+}
+.breadcrumbActive { color: var(--inv-text); font-weight: 650; }
+.filterBar {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;
+  background: var(--inv-panel); border: 1px solid var(--inv-border); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px;
+  box-shadow: var(--inv-shadow);
+}
+.filterField { display: flex; flex-direction: column; gap: 3px; min-width: 140px; }
+.filterField label { font-size: 10.5px; color: var(--inv-muted); font-weight: 650; text-transform: uppercase; letter-spacing: 0.02em; }
+.filterField select { border: 1px solid var(--inv-border); border-radius: 8px; padding: 6px 8px; font-size: 12.5px; background: var(--inv-panel); color: var(--inv-text); }
+.filterSearch {
+  display: flex; align-items: center; gap: 6px; border: 1px solid var(--inv-border); border-radius: 8px; padding: 6px 9px;
+  flex: 1; min-width: 200px; color: var(--inv-muted);
+}
+.filterSearch input { border: none; outline: none; flex: 1; font-size: 12.5px; background: transparent; color: var(--inv-text); }
+.filterSearch button { border: none; background: transparent; cursor: pointer; display: flex; color: var(--inv-muted); }
+.summaryStrip { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+.miniMetric {
+  display: flex; align-items: center; gap: 8px; background: var(--inv-panel); border: 1px solid var(--inv-border);
+  border-radius: 10px; padding: 8px 10px; color: var(--inv-primary); box-shadow: var(--inv-shadow);
+}
+.miniMetricValue { font-size: 15px; font-weight: 800; color: var(--inv-text); line-height: 1.1; }
+.miniMetricLabel { font-size: 10.5px; color: var(--inv-muted); }
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(250px, 285px) minmax(520px, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+.panel { background: var(--inv-panel); border: 1px solid var(--inv-border); border-radius: 12px; padding: 10px; box-shadow: var(--inv-shadow); }
+@media (max-width: 960px) {
+  .workspace { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .pageHeader { flex-direction: column; align-items: stretch; }
+  .filterBar { flex-direction: column; align-items: stretch; }
+  .filterField { min-width: 0; }
+  .summaryStrip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

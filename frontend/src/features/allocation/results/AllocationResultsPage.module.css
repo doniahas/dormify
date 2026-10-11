@@ -1,0 +1,269 @@
+/*
+ * Allocation Results page: page-local variables, layout, top bar, meta card,
+ * view tabs, panel heading and the shared empty/loading/error state. Moved
+ * out of AllocationResultsPage.jsx's inline style string unchanged (R4);
+ * scoped by Vite as a CSS Module (the :root block stays global by nature).
+ */
+:root {
+  --page-bg: #f5f7fb;
+  --card-bg: var(--df-color-surface);
+  --text: var(--df-color-text);
+  --muted: var(--df-color-text-subtle);
+  --border: rgba(15, 23, 42, 0.09);
+  --blue: var(--df-color-primary);
+  --blue-soft: rgba(37, 99, 235, 0.10);
+  --green: var(--df-color-success);
+  --green-soft: rgba(5, 150, 105, 0.10);
+  --amber: var(--df-color-warning);
+  --amber-soft: rgba(217, 119, 6, 0.10);
+  --purple: var(--df-color-accent);
+  --purple-soft: rgba(124, 58, 237, 0.10);
+  --red: var(--df-color-danger);
+  --red-soft: rgba(220, 38, 38, 0.10);
+  --shadow:
+    0 14px 38px rgba(15, 23, 42, 0.08);
+  --shadow-soft:
+    0 7px 20px rgba(15, 23, 42, 0.06);
+}
+.allocationResultsPage {
+  min-height: 100vh;
+  padding: 24px;
+  background:
+  radial-gradient(
+  circle at top right,
+  rgba(37, 99, 235, 0.06),
+  transparent 28%
+  ),
+  var(--page-bg);
+}
+.resultsShell {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.resultsTopbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.90);
+  box-shadow: var(--shadow-soft);
+}
+.resultsTopbar h1 {
+  margin: 0;
+  color: var(--text);
+  font-size: 31px;
+  font-weight: 950;
+}
+.resultsTopbar p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 11px;
+  padding: 7px 11px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: white;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 900;
+}
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: white;
+  color: var(--text);
+  box-shadow: var(--shadow-soft);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+.backButton:hover { transform: translateY(-1px); }
+.metaGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+.singleMeta .metaCard { width: 100%; }
+.metaCard {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: white;
+  box-shadow: var(--shadow-soft);
+}
+.metaIcon {
+  width: 43px;
+  height: 43px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 14px;
+}
+.metaIcon.purple {
+  background: var(--purple-soft);
+  color: var(--purple);
+}
+.metaLabel {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+.metaValue {
+  margin-top: 4px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 950;
+}
+.resultsPanel {
+  min-height: 430px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: white;
+  box-shadow: var(--shadow);
+}
+.viewTabs {
+  display: grid;
+  grid-template-columns:
+  repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.viewTab {
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  background: var(--df-color-surface-muted);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: 0.16s ease;
+}
+.viewTab:hover {
+  transform: translateY(-1px);
+  background: white;
+  color: var(--text);
+}
+.viewTab strong {
+  min-width: 29px;
+  height: 29px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(100, 116, 139, 0.12);
+  color: var(--df-color-text-muted);
+  font-size: 12px;
+}
+.viewTab.active.assigned {
+  border-color: rgba(37, 99, 235, 0.28);
+  background: var(--blue-soft);
+  color: var(--blue);
+}
+.viewTab.active.unassigned {
+  border-color: rgba(217, 119, 6, 0.28);
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+.viewTab.active.beds {
+  border-color: rgba(5, 150, 105, 0.28);
+  background: var(--green-soft);
+  color: var(--green);
+}
+.panelHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid var(--border);
+}
+.panelTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 950;
+}
+.emptyState {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 15px;
+  border: 1px dashed
+  rgba(15, 23, 42, 0.14);
+  border-radius: 16px;
+  background:
+  rgba(15, 23, 42, 0.03);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+.emptyState.error {
+  border-color:
+  rgba(220, 38, 38, 0.20);
+  background: var(--red-soft);
+  color: var(--red);
+}
+.retryLoadBtn {
+  margin-inline-start: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border: none;
+  border-radius: 10px;
+  background: var(--red);
+  color: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+@media (max-width: 900px) {
+  .resultsTopbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .metaGrid { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+  .viewTabs { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .allocationResultsPage { padding: 13px; }
+  .resultsTopbar h1 { font-size: 25px; }
+  .resultsPanel { padding: 13px; }
+}

@@ -1,0 +1,27 @@
+{
+  // Incremental TypeScript adoption (R3). JavaScript stays part of the
+  // program so types flow across the JS/TS boundary, but JS files are not
+  // type-checked: enabling checkJs today reports ~2,800 errors in the pages.
+  // Vite transpiles .ts/.tsx natively; `tsc` only type-checks (noEmit).
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "types": ["vite/client"],
+
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}

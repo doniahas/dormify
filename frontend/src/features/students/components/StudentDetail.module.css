@@ -1,0 +1,87 @@
+/* Student detail view: hero card, assignment stats, info cards, roommates, requests. */
+.spinner { color: #3d9fe0; animation: spin 1s linear infinite; flex-shrink: 0; }
+@keyframes spin {from { transform: rotate(0deg); } to { transform: rotate(360deg); }}
+.detailWrap { display: flex; flex-direction: column; gap: 20px; }
+.heroCard { background: linear-gradient(135deg, var(--df-color-primary) 0%, #3b82f6 100%); border-radius: 22px; padding: 22px 28px 28px; color: white; box-shadow: 0 10px 30px rgba(37,99,235,0.20); position: relative; overflow: hidden; }
+.heroCard.heroRemoved { background: linear-gradient(135deg, var(--df-color-danger) 0%, #ef4444 100%); box-shadow: 0 10px 30px rgba(220,38,38,0.20); }
+.heroCard::before { content: ''; position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%); pointer-events: none; }
+.heroTopRow { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; position: relative; flex-wrap: wrap; gap: 10px; }
+.backPill, .addRequestPill, .assignBedPill, .editStudentPill { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.18); color: white; border: 1px solid rgba(255,255,255,0.32); padding: 9px 16px; border-radius: 12px; font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.15s; }
+.backPill:hover, .addRequestPill:hover, .assignBedPill:hover, .editStudentPill:hover { background: rgba(255,255,255,0.28); }
+.assignBedPill { background: rgba(16,185,129,0.25); border-color: rgba(16,185,129,0.5); }
+.assignBedPill:hover { background: rgba(16,185,129,0.4) !important; }
+.heroBody { display: flex; gap: 28px; justify-content: space-between; align-items: flex-start; position: relative; flex-wrap: wrap; }
+.heroLeft { display: flex; gap: 22px; align-items: center; }
+.heroAvatar { width: 96px; height: 96px; background: rgba(255,255,255,0.18); border: 2px solid rgba(255,255,255,0.3); border-radius: 24px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 42px; flex-shrink: 0; }
+.heroInfo h1 { font-size: 30px; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.4px; }
+.heroId { font-size: 14px; opacity: 0.9; margin-bottom: 10px; }
+.heroId strong { font-family: monospace; margin-inline-start: 4px; }
+.heroBadges { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.heroStatus { padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 700; }
+.heroStatus.assigned { background: #d1fae5; color: var(--df-color-success); }
+.heroStatus.unassigned { background: var(--df-color-danger-soft); color: var(--df-color-danger-strong); }
+.heroRemovedBadge { display: inline-flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.2); padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 700; }
+.heroPriority { display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.22); padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+.heroMeta { display: flex; flex-direction: column; gap: 10px; min-width: 200px; }
+.heroMetaRow { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.heroMetaRow svg { opacity: 0.85; flex-shrink: 0; }
+.heroMetaRow strong { font-weight: 700; opacity: 0.9; margin-inline-end: 4px; }
+.detailSpinner { position: absolute; top: 20px; right: 50%; color: white; opacity: 0.8; }
+.sectionHeading { font-size: 17px; font-weight: 800; color: var(--df-color-text); padding: 0 4px; margin-top: 4px; }
+.statsRow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+.statCard { background: white; border-radius: 16px; padding: 20px 16px; text-align: center; box-shadow: 0 2px 6px rgba(15,23,42,0.04); border: 1px solid var(--df-color-page-bg); }
+.miniStatIcon { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
+.miniStatIcon.blue { background: var(--df-color-primary-soft); color: var(--df-color-primary); }
+.miniStatIcon.green { background: #d1fae5; color: var(--df-color-success); }
+.miniStatIcon.purple { background: #ede9fe; color: var(--df-color-accent); }
+.miniStatIcon.orange { background: #ffedd5; color: #ea580c; }
+.miniStatIcon.yellow { background: var(--df-color-warning-soft); color: var(--df-color-warning); }
+.statLabel { font-size: 13px; color: var(--df-color-text-subtle); font-weight: 600; margin-bottom: 4px; }
+.statValue { font-size: 28px; font-weight: 800; color: var(--df-color-text); letter-spacing: -0.5px; }
+.statValue.sm { font-size: 20px; }
+.twoCol { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.card { background: white; border-radius: 18px; box-shadow: 0 2px 8px rgba(15,23,42,0.05); border: 1px solid var(--df-color-page-bg); overflow: hidden; }
+.cardHeader { display: flex; align-items: center; gap: 10px; padding: 18px 22px 14px; border-bottom: 1px solid var(--df-color-surface-muted); }
+.cardHeader h3 { font-size: 16px; font-weight: 800; color: var(--df-color-text); }
+.cardIcon { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.cardIcon.contact { background: var(--df-color-primary-soft); color: var(--df-color-primary); }
+.cardIcon.housing { background: #1e293b; color: white; }
+.cardIcon.roommates { background: #ede9fe; color: var(--df-color-accent); }
+.cardIcon.personal { background: var(--df-color-page-bg); color: var(--df-color-text-muted); }
+.cardIcon.requests { background: var(--df-color-warning-soft); color: var(--df-color-warning); }
+.cardBody { padding: 8px 22px 18px; }
+.infoRow { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--df-color-surface-muted); }
+.infoRow:last-child { border-bottom: none; }
+.infoKey { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--df-color-text-subtle); font-weight: 600; }
+.infoVal { font-size: 15px; font-weight: 700; color: var(--df-color-text); text-align: end; word-break: break-word; }
+.muted { color: var(--df-color-text-faint); font-size: 14px; font-style: italic; padding: 8px 0; }
+.roommatesGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.roommateCard { display: flex; align-items: center; gap: 12px; background: var(--df-color-surface-muted); border-radius: 14px; padding: 14px 16px; border: 1px solid var(--df-color-page-bg); }
+.rmAvatar { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; flex-shrink: 0; }
+.rmInfo { flex: 1; min-width: 0; }
+.rmName { font-weight: 700; color: var(--df-color-text); font-size: 15px; margin-bottom: 2px; }
+.rmMeta { font-size: 12px; color: var(--df-color-text-subtle); display: flex; align-items: center; gap: 4px; }
+.requestsList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.requestsList li { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--df-color-surface-muted); }
+.requestsList li:last-child { border-bottom: none; }
+.rqNum { width: 26px; height: 26px; background: var(--df-color-page-bg); color: var(--df-color-text-muted); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; }
+.rqName { font-size: 14px; font-weight: 600; color: var(--df-color-text); }
+.priorityNotice { display: flex; align-items: center; gap: 10px; padding: 16px 20px; background: #fef9c3; border: 1px solid #fde68a; border-radius: 14px; color: #92400e; font-size: 14px; font-weight: 600; }
+.priorityNotice svg { color: var(--df-color-warning); }
+.fieldMissingBadge { background: #fef2f2; color: var(--df-color-danger-strong); border: 1px solid #fca5a5; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 700; }
+@media (max-width: 1100px) {
+  .statsRow { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 860px) {
+  .twoCol { grid-template-columns: 1fr; }
+  .statsRow { grid-template-columns: repeat(2, 1fr); }
+  .heroBody { flex-direction: column; }
+  .heroMeta { width: 100%; }
+}
+@media (max-width: 560px) {
+  .statsRow { grid-template-columns: 1fr 1fr; }
+  .heroCard { padding: 18px; }
+  .heroAvatar { width: 72px; height: 72px; font-size: 32px; }
+  .heroInfo h1 { font-size: 24px; }
+  .roommatesGrid { grid-template-columns: 1fr; }
+}

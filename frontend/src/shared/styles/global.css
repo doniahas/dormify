@@ -1,0 +1,20 @@
+/*
+ * Global reset and document styles (R3).
+ *
+ * These rules used to live in the inline <style> block of app/App.jsx
+ * (and the box-sizing reset was repeated by individual pages). They are
+ * declared exactly once here, imported from src/index.jsx before the app
+ * renders. The values are the same ones the app has always used - see
+ * tokens.css for where each one comes from.
+ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--df-font-family);
+  background: var(--df-color-page-bg);
+  min-height: 100vh;
+}

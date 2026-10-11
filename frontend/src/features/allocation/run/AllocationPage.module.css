@@ -1,0 +1,640 @@
+/*
+ * Allocation (run) page: page variables, shell, card chrome, loading/error
+ * states, header card and stats, status badge, population summary, max search
+ * time card, controls bar and buttons, progress card, inline alert and the
+ * inbox notice. Moved out of AllocationPage.jsx's inline styles string
+ * unchanged (R4); scoped by Vite as a CSS Module. The --ap-* variables stay
+ * on the page root (.apPage) exactly as before, so every descendant module
+ * resolves the same values.
+ */
+/* ── Variables ────────────────────────────── */
+.apPage {
+  --ap-bg: #f0f4f8;
+  --ap-surface: var(--df-color-surface);
+  --ap-surface-2: var(--df-color-surface-muted);
+  --ap-border: rgba(15, 23, 42, 0.08);
+  --ap-border-m: rgba(15, 23, 42, 0.13);
+  --ap-text: var(--df-color-text);
+  --ap-text-2: var(--df-color-text-muted);
+  --ap-muted: var(--df-color-text-faint);
+  --ap-blue: var(--df-color-primary);
+  --ap-blue-soft: rgba(37, 99, 235, 0.08);
+  --ap-blue-border: rgba(37, 99, 235, 0.18);
+  --ap-green: var(--df-color-success);
+  --ap-green-soft: rgba(5, 150, 105, 0.09);
+  --ap-green-border: rgba(5, 150, 105, 0.18);
+  --ap-amber: var(--df-color-warning);
+  --ap-amber-soft: rgba(217, 119, 6, 0.09);
+  --ap-amber-border: rgba(217, 119, 6, 0.18);
+  --ap-red: var(--df-color-danger);
+  --ap-red-soft: rgba(220, 38, 38, 0.09);
+  --ap-red-border: rgba(220, 38, 38, 0.18);
+  --ap-shadow: 0 1px 3px rgba(15,23,42,0.06), 0 4px 14px rgba(15,23,42,0.05);
+  --ap-shadow-md: 0 4px 20px rgba(15,23,42,0.09);
+  --ap-radius: 14px;
+  --ap-radius-sm: 10px;
+  --ap-radius-xs: 7px;
+  min-height: calc(100vh - 64px);
+  padding: 20px;
+  background: linear-gradient(145deg, #eef2f7 0%, #e8f0fe 55%, #edfaf4 100%);
+  font-family: inherit;
+}
+/* ── Shell ───────────────────────────────── */
+.apShell {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+/* ── Card base ──────────────────────────── */
+.apCard {
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-border);
+  border-radius: var(--ap-radius);
+  box-shadow: var(--ap-shadow);
+  overflow: hidden;
+  transition: box-shadow 0.18s;
+}
+.apCard:hover { box-shadow: var(--ap-shadow-md); }
+.apCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--ap-border);
+}
+.apCardTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--ap-text);
+}
+.apCardTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ap-text);
+}
+/* ── Loading / Error ─────────────────────── */
+.apLoadingState,
+  .apErrorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 360px;
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-border);
+  border-radius: var(--ap-radius);
+  box-shadow: var(--ap-shadow);
+  max-width: 520px;
+  margin: 40px auto;
+  color: var(--ap-muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+.apErrorState { color: var(--ap-red); }
+.apErrorTitle { margin: 0; font-size: 16px; font-weight: 700; }
+.apErrorMsg { margin: 0; font-size: 13px; color: var(--ap-muted); text-align: center; max-width: 360px; }
+.apRetryBtn {
+  padding: 9px 18px;
+  border-radius: var(--ap-radius-sm);
+  border: 1px solid var(--ap-blue-border);
+  background: var(--ap-blue-soft);
+  color: var(--ap-blue);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.apRetryBtn:hover { background: rgba(37,99,235,0.14); }
+/* ── Header Card ─────────────────────────── */
+.apHeaderCard {
+  background: linear-gradient(135deg, var(--df-color-surface) 60%, rgba(37,99,235,0.03) 100%);
+  border: 1px solid var(--ap-border);
+  border-radius: var(--ap-radius);
+  box-shadow: var(--ap-shadow-md);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.apHeaderTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.apPageTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ap-text);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.apPageSubtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--ap-text-2);
+  font-weight: 500;
+}
+.apHeaderMeta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.apLastRun {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--ap-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.apRegionChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--ap-blue-soft);
+  border: 1px solid var(--ap-blue-border);
+  color: var(--ap-blue);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.apHeaderStats {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: linear-gradient(135deg, var(--ap-surface-2) 0%, rgba(37,99,235,0.03) 100%);
+  border: 1px solid var(--ap-border);
+  border-radius: var(--ap-radius-sm);
+  padding: 0;
+  overflow: hidden;
+}
+.apStatItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  flex: 1;
+}
+.apStatDivider {
+  width: 1px;
+  height: 36px;
+  background: var(--ap-border);
+  flex-shrink: 0;
+}
+.apStatIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--ap-radius-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.apStatBlue { background: var(--ap-blue-soft);  border: 1px solid var(--ap-blue-border);  color: var(--ap-blue); }
+.apStatGreen { background: var(--ap-green-soft); border: 1px solid var(--ap-green-border); color: var(--ap-green); }
+.apStatAmber { background: var(--ap-amber-soft); border: 1px solid var(--ap-amber-border); color: var(--ap-amber); }
+.apStatSlate { background: rgba(100,116,139,0.09); border: 1px solid rgba(100,116,139,0.18); color: var(--df-color-text-muted); }
+.apStatVal { font-size: 20px; font-weight: 800; color: var(--ap-text); letter-spacing: -0.02em; }
+.apStatLbl { font-size: 11.5px; font-weight: 600; color: var(--ap-muted); margin-top: 1px; }
+.apStatGreenText { color: var(--ap-green); }
+.apStatAmberText { color: var(--ap-amber); }
+/* ── Status Badge ─────────────────────────── */
+.apStatusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.badgeGray { background: rgba(100,116,139,0.09); border-color: rgba(100,116,139,0.18); color: var(--df-color-text-muted); }
+.badgeBlue { background: var(--ap-blue-soft);  border-color: var(--ap-blue-border);  color: var(--ap-blue); }
+.badgeGreen { background: var(--ap-green-soft); border-color: var(--ap-green-border); color: var(--ap-green); }
+.badgeAmber { background: var(--ap-amber-soft); border-color: var(--ap-amber-border); color: var(--ap-amber); }
+.badgeRed { background: var(--ap-red-soft);   border-color: var(--ap-red-border);   color: var(--ap-red); }
+.apBadgeDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+.apBadgeDotPulse { animation: ap-dot-pulse 1.6s ease-in-out infinite; }
+@keyframes ap-dot-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+/* ── Population Summary (compact) ─────────── */
+.apPopulationCard {
+  background: #fff;
+  border: 1px solid var(--ap-border);
+  border-radius: var(--ap-radius);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.apPopulationRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.apPopulationChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.apPopulationChipBlue { background: var(--ap-blue-soft);  border: 1px solid var(--ap-blue-border);  color: var(--ap-blue); }
+.apPopulationChipAmber { background: var(--ap-amber-soft); border: 1px solid var(--ap-amber-border); color: var(--ap-amber); }
+.apPopulationChipGreen { background: var(--ap-green-soft); border: 1px solid var(--ap-green-border); color: var(--ap-green); }
+.apPopulationArrow {
+  color: var(--ap-text-2);
+  font-size: 13px;
+}
+.apPopulationToggle {
+  margin-inline-start: auto;
+  background: none;
+  border: none;
+  color: var(--ap-blue);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+.apPopulationToggle:hover { text-decoration: underline; }
+.apPopulationDetails {
+  margin: 0;
+  padding-inline-start: 18px;
+  font-size: 12.5px;
+  color: var(--ap-text-2);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.apPopulationDetailsTotal {
+  font-weight: 700;
+  color: var(--ap-text);
+  list-style: none;
+  margin-inline-start: -18px;
+  margin-top: 2px;
+}
+.apPopulationProcessed {
+  font-size: 12.5px;
+  color: var(--ap-text-2);
+  font-weight: 600;
+}
+/* ── Controls Bar ────────────────────────── */
+.apControlsBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-border);
+  border-radius: var(--ap-radius);
+  box-shadow: var(--ap-shadow);
+  padding: 12px 16px;
+  flex-wrap: wrap;
+}
+.apControlsLeft,
+  .apControlsRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+/* ── Buttons ─────────────────────────────── */
+.apBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  border-radius: var(--ap-radius-sm);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  border: 1px solid transparent;
+  transition: transform 0.14s, filter 0.14s, background 0.14s, border-color 0.14s;
+  white-space: nowrap;
+  line-height: 1;
+}
+.apBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+  filter: none !important;
+}
+.apBtnPrimary {
+  background: linear-gradient(135deg, #10b981, var(--df-color-success));
+  color: #fff;
+  border-color: rgba(5,150,105,0.25);
+  box-shadow: 0 4px 12px rgba(5,150,105,0.25);
+}
+.apBtnPrimary:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.04); }
+.apBtnGhost {
+  background: rgba(15,23,42,0.03);
+  color: var(--ap-text);
+  border-color: var(--ap-border);
+}
+.apBtnGhost:hover:not(:disabled) {
+  background: var(--ap-blue-soft);
+  border-color: var(--ap-blue-border);
+  color: var(--ap-blue);
+}
+.apBtnGhostDanger {
+  background: var(--ap-red-soft);
+  color: var(--ap-red);
+  border-color: var(--ap-red-border);
+}
+.apBtnGhostDanger:hover:not(:disabled) { background: rgba(220,38,38,0.13); }
+.apBtnWarning {
+  background: linear-gradient(135deg, #f59e0b, var(--df-color-warning));
+  color: #fff;
+  border-color: rgba(217,119,6,0.25);
+  box-shadow: 0 4px 12px rgba(217,119,6,0.22);
+}
+.apBtnWarning:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.04); }
+.apBtnSm {
+  padding: 7px 12px;
+  font-size: 12.5px;
+}
+/* ── Inline Chip ─────────────────────────── */
+.apInlineChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+.apChipAmber {
+  background: var(--ap-amber-soft);
+  border-color: var(--ap-amber-border);
+  color: var(--ap-amber);
+}
+/* ── Progress Card ───────────────────────── */
+.apProgressCard {
+  background: linear-gradient(135deg, rgba(37,99,235,0.06), rgba(16,185,129,0.04));
+  border: 1px solid var(--ap-blue-border);
+  border-radius: var(--ap-radius);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.apProgressHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.apProgressStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ap-blue);
+}
+.apProgressTimer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ap-text-2);
+  font-variant-numeric: tabular-nums;
+}
+.apProgressBarWrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.apProgressBar {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(15,23,42,0.08);
+  overflow: hidden;
+}
+.apProgressFill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--ap-blue), var(--ap-green));
+  transition: width 0.4s ease;
+}
+.apProgressPct {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--ap-text-2);
+  min-width: 38px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.apProgressDetail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+/* ── Inline Alert ────────────────────────── */
+.apInlineAlert {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 14px;
+  border-radius: var(--ap-radius-sm);
+  background: var(--ap-amber-soft);
+  border: 1px solid var(--ap-amber-border);
+  color: var(--ap-amber);
+  font-size: 13px;
+  font-weight: 600;
+}
+.apInlineAlert button {
+  margin-left: auto;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--ap-amber);
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 4px;
+  font-weight: 700;
+}
+/* ── Inbox Notice ────────────────────────── */
+.apInboxNotice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, var(--ap-blue-soft), rgba(99,102,241,0.06));
+  border: 1px solid var(--ap-blue-border);
+  border-radius: var(--ap-radius-sm);
+  flex-wrap: wrap;
+}
+.apInboxIconWrap {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--ap-radius-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.8);
+  border: 1px solid rgba(255,255,255,0.6);
+  color: var(--ap-blue);
+  flex-shrink: 0;
+}
+.apInboxBody {
+  flex: 1;
+  min-width: 0;
+}
+.apInboxTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e3a8a;
+  display: block;
+  margin-bottom: 4px;
+}
+.apInboxDetail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--ap-text-2);
+  font-weight: 500;
+  flex-wrap: wrap;
+}
+.apInboxDetail strong { color: var(--ap-text); font-weight: 800; }
+.apInboxMetaSep { color: var(--ap-muted); }
+.apInboxStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  background: rgba(15,23,42,0.04);
+  border: 1px solid var(--ap-border);
+  color: var(--ap-text-2);
+  white-space: nowrap;
+}
+.apInboxPending {
+  background: var(--ap-amber-soft);
+  border-color: var(--ap-amber-border);
+  color: var(--ap-amber);
+}
+/* ── Main Content ────────────────────────── */
+.apMainCol {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+/* ── Max Search Time ("זמן חיפוש מרבי") ──── */
+.apMaxtimeCard { padding: 16px 20px; }
+.apMaxtimeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.apMaxtimeLabel {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ap-text);
+}
+.apMaxtimeInputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.apNumberInput {
+  width: 96px;
+  padding: 8px 12px;
+  border-radius: var(--ap-radius-xs);
+  border: 1px solid var(--ap-border-m);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ap-text);
+  font-family: inherit;
+  background: var(--ap-surface);
+  text-align: center;
+}
+.apNumberInput:focus, .apUnitSelect:focus {
+  outline: none;
+  border-color: var(--ap-blue-border);
+  box-shadow: 0 0 0 3px var(--ap-blue-soft);
+}
+.apUnitSelect {
+  padding: 8px 12px;
+  border-radius: var(--ap-radius-xs);
+  border: 1px solid var(--ap-border-m);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ap-text);
+  font-family: inherit;
+  background: var(--ap-surface);
+  cursor: pointer;
+}
+.apMaxtimeHint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--ap-muted);
+  font-weight: 500;
+}
+.apMaxtimeError {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ap-red);
+}
+/* ── Spin ────────────────────────────────── */
+.apSpin { animation: ap-spin 0.9s linear infinite; }
+@keyframes ap-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+/* ── Responsive ──────────────────────────── */
+@media (max-width: 768px) {
+  .apPage { padding: 12px; }
+  .apHeaderStats { flex-wrap: wrap; }
+  .apStatItem { flex: 0 1 calc(50% - 1px); }
+  .apControlsBar { flex-direction: column; align-items: stretch; }
+  .apControlsLeft, .apControlsRight { justify-content: stretch; }
+  .apControlsLeft .apBtn, .apControlsRight .apBtn { flex: 1; justify-content: center; }
+}
+@media (max-width: 480px) {
+  .apHeaderTop { flex-direction: column; }
+  .apHeaderMeta { justify-content: flex-start; }
+  .apStatItem { flex: 1 1 100%; }
+  .apStatDivider { display: none; }
+}

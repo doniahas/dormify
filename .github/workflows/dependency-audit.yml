@@ -1,0 +1,94 @@
+name: Dependency audit
+
+# Known vulnerabilities in the dependency graph, reported on every push and
+# pull request and once a week, since new advisories appear without any code
+# change. Kept apart from ci.yml so the weekly run does not repeat the full
+# test matrix.
+#
+# Release gate policy:
+#   * push and pull_request runs are BLOCKING: any Python finding
+#     (`--fail-on any`) and any npm finding of high or critical severity
+#     (`--fail-on high`) fail the job, so a vulnerable graph cannot merge or
+#     land on a release branch unnoticed.
+#   * the weekly scheduled run and manual dispatches are ADVISORY: a new
+#     advisory published without any code change is reported as warnings and
+#     in the job summary rather than turning the default branch red; the
+#     next push or Dependabot pull request then hits the blocking gate.
+# In every mode a scanner that cannot run or returns no usable report fails
+# the run, so a broken scan is never mistaken for a clean one.
+
+on:
+  pull_request:
+    branches:
+      - main
+      - 'refactor/**'
+  push:
+    branches:
+      - main
+      - 'refactor/**'
+  schedule:
+    # Mondays 06:00 UTC.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: dependency-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      # Blocking on push and pull_request; advisory (no --fail-on) on the
+      # weekly schedule and on manual dispatch. See the header comment.
+      PYTHON_FAIL_ON: ${{ (github.event_name == 'push' || github.event_name == 'pull_request') && '--fail-on any' || '' }}
+      NPM_FAIL_ON: ${{ (github.event_name == 'push' || github.event_name == 'pull_request') && '--fail-on high' || '' }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: backend/requirements-dev.txt
+
+      # npm audit reads only the committed lockfile, so nothing is installed.
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '20.20.2'
+
+      - name: Install audit tooling
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      # Audits the backend runtime graph exactly as pinned in
+      # backend/constraints.txt - not the development tools.
+      - name: Python runtime dependencies (pip-audit)
+        run: python scripts/ci/dependency_audit.py python $PYTHON_FAIL_ON
+
+      # Runs even when the Python audit found something or could not run, so
+      # both reports are always produced; the job still fails afterwards.
+      - name: Frontend npm dependencies (npm audit)
+        if: ${{ !cancelled() }}
+        run: python scripts/ci/dependency_audit.py npm $NPM_FAIL_ON
+
+      # The audits read the lockfile and requirements and must not change
+      # them. Making that an explicit assertion keeps it from drifting.
+      - name: Assert the working tree is still clean
+        if: always()
+        run: |
+          if [ -n "$(git status --porcelain --untracked-files=all)" ]; then
+            echo "::error::The dependency audit modified the working tree:"
+            git status --porcelain --untracked-files=all
+            exit 1
+          fi
+          echo "Working tree is clean."

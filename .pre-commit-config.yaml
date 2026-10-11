@@ -1,0 +1,103 @@
+# Pre-commit checks for Dormify. Every hook here only checks: none of them
+# rewrites files.
+#
+# Install the tool (from the repository root):
+#     pip install -r backend/requirements-dev.txt
+# Run every hook against the whole repository:
+#     pre-commit run --all-files
+# Optionally run them automatically on each commit:
+#     pre-commit install
+#
+# The ESLint hook runs the frontend's own `npm run lint`, so run `npm ci`
+# inside frontend/ first.
+
+minimum_pre_commit_version: '4.6.2'
+
+repos:
+  # Ruff with the existing backend/ruff.toml, which it finds next to the
+  # files it checks. Keep rev equal to the ruff pin in
+  # backend/requirements-dev.txt so local hooks and CI lint identically.
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.10
+    hooks:
+      - id: ruff-check
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+
+  - repo: local
+    hooks:
+      # The frontend's own lint script and ESLint configuration, unchanged:
+      # all of frontend/src (JavaScript and TypeScript), with warnings
+      # treated as failures.
+      - id: frontend-eslint
+        name: frontend ESLint (npm run lint)
+        language: system
+        entry: npm --prefix frontend run lint
+        files: ^frontend/(src/.+\.[jt]sx?|package(-lock)?\.json)$
+        pass_filenames: false
+
+      # The frontend's own type check (tsc --noEmit via tsconfig.json).
+      - id: frontend-typecheck
+        name: frontend type check (npm run typecheck)
+        language: system
+        entry: npm --prefix frontend run typecheck
+        files: ^frontend/(src/.+\.[jt]sx?|src/.+\.d\.ts|tsconfig\.json|package(-lock)?\.json)$
+        pass_filenames: false
+
+      # Check-only counterparts of pre-commit-hooks' trailing-whitespace and
+      # end-of-file-fixer, which rewrite files. pygrep runs inside pre-commit
+      # itself, so it behaves the same on Windows and Linux, and both
+      # patterns accept CRLF working copies.
+      #
+      # Each exclude list holds only the files that already failed the check
+      # when it was added. Remove an entry once that file is cleaned up.
+      - id: no-trailing-whitespace
+        name: no trailing whitespace
+        language: pygrep
+        entry: '[ \t]+\r?$'
+        types: [text]
+        exclude: |
+          (?x)^(
+            backend/allocation/solver\.py|
+            backend/api/models\.py
+          )$
+
+      - id: final-newline
+        name: file ends with a newline
+        language: pygrep
+        entry: '\A\Z|\n\Z'
+        args: [--multiline, --negate]
+        types: [text]
+        exclude: |
+          (?x)^(
+            backend/Dockerfile|
+            backend/accounts/permissions\.py|
+            backend/accounts/serializers\.py|
+            backend/accounts/urls\.py|
+            backend/allocation/solver\.py|
+            backend/api/admin\.py|
+            backend/api/management/commands/run_allocation_case\.py|
+            backend/api/tests/functional/test_analysis\.py|
+            backend/api/tests/functional/test_home_dashboard\.py|
+            backend/api/tests/performance/__init__\.py|
+            backend/api/tests/performance/test_apartments_performance\.py|
+            backend/api/tests/performance/test_buildings_performance\.py|
+            backend/dormify/settings\.py|
+            backend/dormify/urls\.py|
+            backend/seed\.py|
+            frontend/Dockerfile|
+            frontend/src/app/App\.jsx|
+            frontend/src/app/Header\.jsx|
+            frontend/src/features/auth/AuthContext\.jsx|
+            frontend/src/features/auth/LoginPage\.jsx|
+            frontend/src/features/reports/ReportsPage\.jsx|
+            frontend/src/features/settings/SettingsPage\.jsx|
+            frontend/src/features/staff/UsersPage\.css|
+            frontend/src/features/staff/UsersPage\.jsx|
+            frontend/src/features/staff/api\.js|
+            frontend/src/features/uploads/UploadPage\.jsx|
+            frontend/src/features/what-if/WhatIfPage\.jsx
+          )$

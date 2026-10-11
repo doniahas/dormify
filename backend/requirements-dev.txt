@@ -1,0 +1,71 @@
+# ===========================================
+# DORMIFY BACKEND - DEVELOPMENT TOOLING
+# ===========================================
+# Tools that check the code rather than run it. Kept out of
+# requirements.txt so the runtime dependencies, constraints.txt and the
+# backend image stay exactly as they are.
+#
+# Install with:
+#     pip install -r requirements-dev.txt
+#
+# Every package is pinned, including the dependencies the tools pull in, so
+# the install is the same every time. The resolved set below was produced
+# on CPython 3.11 (the backend image and CI version) with constraints.txt
+# applied, so any package shared with the runtime graph carries the same
+# version as constraints.txt and both files install into one environment.
+# Upgrading any of these can change check results, so treat that as a
+# reviewed change.
+# ===========================================
+
+# Python linter - configured in ruff.toml. Ruff has no dependencies.
+# Keep this version equal to the ruff-pre-commit rev in
+# ../.pre-commit-config.yaml so local hooks and CI lint identically.
+ruff==0.16.10
+
+# Git hook runner - configured in ../.pre-commit-config.yaml
+pre-commit==4.6.2
+
+# Resolved dependencies of pre-commit
+cfgv==3.5.0
+distlib==0.4.3
+filelock==4.0.12
+identify==2.6.20
+nodeenv==1.11.0
+packaging==26.3
+platformdirs==4.12.3
+python-discovery==1.6.1
+PyYAML==6.0.3
+virtualenv==21.14.5
+
+# Dependency vulnerability scanner - run through ../scripts/ci/dependency_audit.py,
+# which audits the runtime graph in constraints.txt, not these tools.
+pip-audit==2.10.1
+
+# Resolved dependencies of pip-audit (packaging and platformdirs are pinned
+# above)
+boolean.py==5.0
+CacheControl==0.14.4
+cyclonedx-python-lib==11.12.0
+defusedxml==0.7.1
+license-expression==30.4.4
+markdown-it-py==4.2.0
+mdurl==0.1.2
+msgpack==1.2.3
+packageurl-python==0.17.6
+pip-api==0.0.35
+pip-requirements-parser==32.0.1
+py-serializable==2.1.0
+Pygments==2.21.0
+pyparsing==3.3.3
+rich==15.0.0
+sortedcontainers==2.4.0
+tomli==2.4.1
+tomli-w==1.2.0
+typing-extensions==4.16.0
+
+# Shared with the runtime graph - must stay equal to constraints.txt
+certifi==2026.7.22
+charset-normalizer==3.5.1
+idna==3.19
+requests==2.34.2
+urllib3==2.8.0

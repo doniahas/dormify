@@ -1,0 +1,92 @@
+name: Scheduled backend validation
+
+# Performance and real-concurrency validation are intentionally kept out of
+# ordinary pull-request CI. They run weekly and on demand, each against its own
+# disposable PostgreSQL service. Evidence output stays disabled so a run
+# never writes diagnostic files into the checkout.
+
+on:
+  schedule:
+    # Sundays 04:00 UTC.
+    - cron: '0 4 * * 0'
+  workflow_dispatch:
+
+concurrency:
+  group: scheduled-backend-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  backend-validation:
+    name: ${{ matrix.suite }} validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - performance
+          - concurrency
+
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: dormify_test
+          POSTGRES_USER: dormify_user
+          POSTGRES_PASSWORD: dormify_password
+        ports:
+          - 5435:5432
+        options: >-
+          --health-cmd "pg_isready -U dormify_user -d dormify_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DEBUG: 'True'
+      DORMIFY_LOCAL_DB_ONLY: 'True'
+      DB_NAME: dormify_test
+      DB_USER: dormify_user
+      DB_PASSWORD: dormify_password
+      DB_HOST: localhost
+      DB_PORT: '5435'
+      DB_SSLMODE: disable
+      ALLOCATION_NUM_SEARCH_WORKERS: '1'
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/constraints.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -c constraints.txt
+
+      - name: Run ${{ matrix.suite }} suite
+        run: python manage.py test api.tests.${{ matrix.suite }} --noinput
+
+      - name: Assert the working tree is still clean
+        if: always()
+        working-directory: .
+        run: |
+          if [ -n "$(git status --porcelain --untracked-files=all)" ]; then
+            echo "::error::The scheduled validation modified the working tree:"
+            git status --porcelain --untracked-files=all
+            exit 1
+          fi
+          echo "Working tree is clean."

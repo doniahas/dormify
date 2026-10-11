@@ -1,0 +1,199 @@
+/*
+ * Unassigned analysis cards, the retry-unassigned block and its confirmation
+ * modal. One module so the retry chrome keeps its original cascade.
+ */
+.unassignedAnalysis {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card-bg);
+  box-shadow: var(--shadow-soft);
+}
+.unassignedAnalysisHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 14.5px;
+  color: var(--text);
+}
+.unassignedAnalysisGroups {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.unassignedAnalysisCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(217, 119, 6, 0.04);
+}
+.unassignedAnalysisCardTitle {
+  font-size: 13.5px;
+  color: var(--text);
+  font-weight: 700;
+}
+.unassignedAnalysisCounts {
+  display: flex;
+  gap: 14px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.unassignedAnalysisCompatible {
+  color: var(--amber);
+  font-weight: 700;
+}
+.unassignedAnalysisInventory {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12px;
+}
+.unassignedAnalysisInventoryLabel {
+  color: var(--muted);
+  font-weight: 600;
+}
+.unassignedAnalysisInventoryChip {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--blue-soft);
+  color: var(--blue);
+  font-weight: 700;
+  font-size: 11.5px;
+}
+.unassignedAnalysisReason {
+  font-size: 12.5px;
+  color: var(--text);
+  line-height: 1.5;
+}
+.unassignedAnalysisBuildingsBtn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid var(--blue);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.unassignedAnalysisBuildingsBtn:hover { background: var(--blue-soft); }
+.unassignedRetryBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 4px;
+  border-top: 1px dashed var(--border);
+}
+.unassignedRetryBtn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--blue);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.unassignedRetryBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.unassignedRetryMessage {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.unassignedRetryMessage.error { color: var(--red); }
+.unassignedRetryMessage.success { color: var(--green); }
+.retryConfirmOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.retryConfirmModal {
+  width: min(420px, 92vw);
+  background: var(--card-bg);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.retryConfirmHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--text);
+}
+.retryConfirmClose {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 2px;
+}
+.retryConfirmBody {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.55;
+}
+.retryConfirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.retryConfirmBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--border);
+}
+.retryConfirmBtn.cancel {
+  background: #fff;
+  color: var(--text);
+}
+.retryConfirmBtn.confirm {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+.retryConfirmBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.spin { animation: unassigned-spin 0.9s linear infinite; }
+@keyframes unassigned-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

@@ -1,0 +1,109 @@
+/*
+ * GLOBAL (not a CSS Module): the modal chrome, buttons, form fields and
+ * alerts that BuildingSetupWizard.jsx renders with these exact class names
+ * (it keeps its own <style> and relies on the page having defined them).
+ * Rule text and order are unchanged from BuildingsPage.jsx's inline block.
+ * .inv-modalOverlay re-declares the --inv-* tokens because the modal is
+ * portaled under <body>, outside the page element that declares them.
+ */
+.inv-spin { animation: inv-spin 0.9s linear infinite; }
+@keyframes inv-spin {to { transform: rotate(360deg); }}
+.inv-alert {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  border-radius: 10px; padding: 9px 12px; font-size: 12px; font-weight: 600; margin-bottom: 10px;
+}
+.inv-alert-danger { background: var(--inv-danger-soft); color: var(--inv-danger); }
+.inv-alert-warning { background: var(--inv-warning-soft); color: var(--inv-warning); }
+.inv-alert button { border: none; background: transparent; cursor: pointer; display: flex; color: inherit; }
+.inv-primaryBtn, .inv-secondaryBtn, .inv-dangerBtn, .inv-successBtn {
+  display: inline-flex; align-items: center; gap: 5px; border-radius: 8px; padding: 6px 11px;
+  font-size: 12px; font-weight: 650; cursor: pointer; border: 1px solid transparent; white-space: nowrap;
+}
+.inv-primaryBtn { background: var(--inv-primary); color: #fff; }
+.inv-primaryBtn:hover:not(:disabled) { background: var(--inv-primary-hover); }
+.inv-primaryBtn:disabled { opacity: 0.55; cursor: not-allowed; }
+.inv-secondaryBtn { background: var(--inv-panel); color: var(--inv-text); border-color: var(--inv-border-strong); }
+.inv-dangerBtn { background: var(--inv-danger-soft); color: var(--inv-danger); }
+.inv-dangerBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+.inv-successBtn { background: var(--inv-success-soft); color: var(--inv-success); }
+.inv-iconBtn {
+  border: 1px solid var(--inv-border-strong); background: var(--inv-panel); border-radius: 7px; padding: 5px;
+  cursor: pointer; display: inline-flex; color: var(--inv-muted);
+}
+.inv-iconBtn:hover:not(:disabled) { color: var(--inv-text); border-color: var(--inv-primary); }
+.inv-iconBtn:disabled { opacity: 0.45; cursor: not-allowed; }
+.inv-iconBtn-danger:hover:not(:disabled) { color: var(--inv-danger); border-color: var(--inv-danger); }
+.inv-formField { display: flex; flex-direction: column; gap: 4px; }
+.inv-formField label { font-size: 11px; font-weight: 650; color: var(--inv-muted); }
+.inv-formField input, .inv-formField select, .inv-formField textarea {
+  border: 1px solid var(--inv-border); border-radius: 8px; padding: 7px 9px; font-size: 12.5px; background: var(--inv-panel); color: var(--inv-text);
+  font-family: inherit; resize: vertical;
+}
+.inv-formField small { font-size: 10.5px; color: var(--inv-muted); }
+.inv-modalOverlay {
+  --inv-bg: #f4f5f7;
+  --inv-panel: #ffffff;
+  --inv-panel-subtle: #f9fafb;
+  --inv-border: #e5e7eb;
+  --inv-border-strong: #d1d5db;
+  --inv-text: #111827;
+  --inv-muted: #6b7280;
+  --inv-primary: #2563eb;
+  --inv-primary-hover: #1d4ed8;
+  --inv-primary-soft: #dbeafe;
+  --inv-success: #059669;
+  --inv-success-soft: #d1fae5;
+  --inv-warning: #b45309;
+  --inv-warning-soft: #fef3c7;
+  --inv-danger: #dc2626;
+  --inv-danger-soft: #fee2e2;
+  position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); opacity: 1; display: grid; place-items: center;
+  z-index: 9999; padding: 24px;
+}
+.inv-modal {
+  background: #ffffff; opacity: 1; isolation: isolate;
+  width: min(880px, calc(100vw - 48px)); max-height: calc(100vh - 48px); border-radius: 16px;
+  border: 1px solid var(--inv-border);
+  box-shadow: 0 20px 60px rgba(16, 24, 40, 0.35), 0 2px 8px rgba(16, 24, 40, 0.12);
+  display: flex; flex-direction: column; overflow: hidden; margin: 0; position: relative;
+}
+.inv-modalHeader { display: flex; align-items: flex-start; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--inv-border); flex-shrink: 0; }
+.inv-modalHeaderIcon {
+  width: 36px; height: 36px; border-radius: 10px; background: var(--inv-primary-soft); color: var(--inv-primary);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.inv-modalHeaderText { flex: 1; min-width: 0; }
+.inv-modalHeaderText h3 { margin: 0; font-size: 15.5px; font-weight: 750; }
+.inv-modalHeaderContext { margin: 3px 0 0; font-size: 12px; color: var(--inv-muted); }
+.inv-modalBody { padding: 18px 20px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+.inv-modalFooter { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 20px; border-top: 1px solid var(--inv-border); flex-shrink: 0; }
+.inv-modalSection {
+  border: 1px solid var(--inv-border); border-radius: 12px; padding: 14px 16px; background: var(--inv-panel-subtle);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.inv-modalSection h4 { margin: 0; font-size: 11px; font-weight: 700; color: var(--inv-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+.inv-modalGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; }
+.inv-modalGrid.is-single { grid-template-columns: 1fr; }
+.inv-readonlyField { display: flex; flex-direction: column; gap: 4px; }
+.inv-readonlyField label { font-size: 11px; font-weight: 650; color: var(--inv-muted); }
+.inv-readonlyValue {
+  font-size: 12.5px; padding: 7px 9px; border-radius: 8px; background: var(--inv-panel); border: 1px dashed var(--inv-border-strong);
+  color: var(--inv-text); min-height: 16px;
+}
+.inv-summaryRow {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px;
+  padding-top: 10px; border-top: 1px dashed var(--inv-border);
+}
+.inv-summaryItem { text-align: center; }
+.inv-summaryItem span { display: block; font-size: 10px; color: var(--inv-muted); margin-bottom: 2px; }
+.inv-summaryItem strong { font-size: 14px; font-weight: 750; }
+.inv-infoCallout {
+  display: flex; align-items: flex-start; gap: 8px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8;
+  border-radius: 10px; padding: 10px 12px; font-size: 11.5px; line-height: 1.5;
+}
+.inv-infoCallout svg { flex-shrink: 0; margin-top: 1px; }
+@media (max-width: 640px) {
+  .inv-modalOverlay { padding: 12px; }
+  .inv-modal { width: calc(100vw - 24px); max-width: calc(100vw - 24px); max-height: calc(100vh - 24px); }
+  .inv-modalGrid { grid-template-columns: 1fr; }
+}

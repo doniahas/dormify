@@ -1,0 +1,227 @@
+# =====================================================================
+# Dormify - local development stack
+# =====================================================================
+# Every resource this stack creates is namespaced so it can run safely
+# alongside other Docker projects on the same host, and so it can never
+# adopt another project's data:
+#
+#   1. Compose project name  -> `name: dormify-v3`.
+#   2. Persistent resources  -> the network and both volumes declare
+#      EXPLICIT `name:` values. An explicitly named resource is not
+#      prefixed with the Compose project name, so its identity is fixed
+#      by this file alone and cannot be redirected by COMPOSE_PROJECT_NAME
+#      or `-p`. Persistent data must never be shared by accident.
+#   3. Container names       -> not pinned. Docker container names are a
+#      single global namespace, so hard-coding them risks collisions with
+#      unrelated containers. Compose-generated names avoid this entirely.
+#   4. Host ports            -> dedicated development ports, kept clear of
+#      the defaults commonly taken by other local services.
+#   5. Database              -> a dedicated local service (see `db`), with
+#      no external database dependency of any kind.
+#
+# Because COMPOSE_PROJECT_NAME and `-p` outrank the `name:` field above,
+# pin the project explicitly when running Compose commands here:
+#
+#     docker compose -p dormify-v3 <command>
+#
+# `restart: always` is deliberately not used: these are development
+# containers and should not restart themselves on reboot.
+# =====================================================================
+
+name: dormify-v3
+
+# ---------------------------------------------------------------------
+# Shared backend runtime environment
+# ---------------------------------------------------------------------
+# The web process (`backend`) and the allocation worker (`allocation_worker`)
+# run the same Django code against the same database and must agree on every
+# value below, so the block is declared once and merged into both services.
+x-backend-environment: &backend-environment
+  # DEBUG defaults to False when the variable is absent (secure by
+  # default). These containers mount only ./backend, not the repository
+  # root, so settings.py's load_dotenv() call finds no .env file here -
+  # DEBUG must therefore be supplied explicitly for local Docker
+  # development to behave as development. SECRET_KEY is intentionally
+  # unset: with DEBUG=True, settings.py falls back to a fixed,
+  # clearly-labelled development-only key, which is appropriate for a
+  # throwaway container and keeps setup minimal.
+  DEBUG: "True"
+
+  # Restricts the application to explicitly approved local database
+  # hosts. This is the safety boundary for database selection, kept
+  # deliberately separate from DEBUG, which only controls error
+  # reporting. With this enabled, startup fails against any host that
+  # is not recognised as local. See backend/dormify/db_safety.py.
+  DORMIFY_LOCAL_DB_ONLY: "True"
+
+  # Every DB_* value below is a literal, never `${DB_VAR}`. Compose
+  # interpolates `${...}` from the host environment and from a
+  # repository-root .env file, so an interpolated value here would let
+  # whatever happens to be set outside the container silently redirect
+  # the application's database connection. Literals cannot be
+  # overridden from outside this file.
+  DB_HOST: db
+  DB_PORT: "5432"
+  DB_NAME: dormify_v3_dev
+  DB_USER: dormify_v3_dev
+  DB_PASSWORD: dormify_v3_local_dev_only
+  # settings.py defaults DB_SSLMODE to "require", which the stock
+  # postgres image refuses because it serves plain connections only.
+  DB_SSLMODE: disable
+
+services:
+  # -------------------------------------------------------------------
+  # Development database (disposable, rebuilt from Django migrations)
+  # -------------------------------------------------------------------
+  # The database the application runs against during development. It is
+  # separate from the automated test database (`test_db`, below) in every
+  # respect: different port, different volume, different database name.
+  db:
+    image: postgres:16
+    restart: "no"
+    networks:
+      - dormify-v3-network
+    environment:
+      POSTGRES_DB: dormify_v3_dev
+      POSTGRES_USER: dormify_v3_dev
+      # Local-development-only credential. This database is disposable,
+      # bound to loopback, holds no real data and is rebuilt from
+      # migrations, so a fixed literal keeps first-time setup to a single
+      # command. It must never be reused for anything else.
+      POSTGRES_PASSWORD: dormify_v3_local_dev_only
+    ports:
+      # Published on loopback only - never exposed on other interfaces.
+      - "127.0.0.1:5434:5432"
+    volumes:
+      - dev_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dormify_v3_dev -d dormify_v3_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    image: dormify-v3-backend
+    restart: "no"
+    command: python manage.py runserver 0.0.0.0:8000
+    working_dir: /app
+    networks:
+      - dormify-v3-network
+    volumes:
+      - ./backend:/app
+    ports:
+      - "127.0.0.1:8001:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      <<: *backend-environment
+
+      # Must match the origin the frontend below is served from.
+      CORS_ALLOWED_ORIGINS: "http://localhost:3001,http://127.0.0.1:3001"
+
+  # -------------------------------------------------------------------
+  # Allocation worker
+  # -------------------------------------------------------------------
+  # Executes the background allocation runs the web process queues
+  # (`python manage.py allocation_worker`, see
+  # backend/api/domains/allocation/jobs.py). Same image and runtime
+  # configuration as `backend`, a different command. More than one worker
+  # may run at once (`docker compose -p dormify-v3 up --scale
+  # allocation_worker=2`): runs are claimed with row locks, so each queued
+  # run is executed by exactly one of them, and a run whose worker is lost
+  # is recovered by another once its lease expires.
+  allocation_worker:
+    build: ./backend
+    image: dormify-v3-backend
+    restart: "no"
+    command: python manage.py allocation_worker
+    working_dir: /app
+    networks:
+      - dormify-v3-network
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    # On `stop`, the worker leaves its loop after the run in progress
+    # finishes; a solve longer than this grace period is killed with the
+    # container and recovered by the next worker once its lease expires.
+    stop_grace_period: 30s
+    environment: *backend-environment
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: "no"
+    command: npm start -- --host 0.0.0.0
+    working_dir: /app
+    networks:
+      - dormify-v3-network
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "127.0.0.1:3001:3001"
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+      # The shared Axios client reads one public API root. Supplying it here
+      # prevents the host-development default (port 8000) from pointing the
+      # container-served frontend at the wrong backend.
+      VITE_API_URL: "http://localhost:8001/api"
+
+  # -------------------------------------------------------------------
+  # Automated test database
+  # -------------------------------------------------------------------
+  # Fully separate from the development database above: its own host port,
+  # its own volume and its own database name, so resetting either one
+  # cannot affect the other.
+  #
+  # Port 5435 is reserved for the isolated automated test database. The
+  # safety check in ensure_local_test_database()
+  # (backend/api/management/commands/run_allocation_case.py) requires
+  # exactly DB_NAME=dormify_test, DB_HOST=localhost and DB_PORT=5435, so
+  # that destructive test command can only ever reach this service.
+  #
+  # Kept behind the `local-db` profile so a normal `up` does not start it.
+  test_db:
+    image: postgres:16
+    restart: "no"
+    profiles:
+      - local-db
+    networks:
+      - dormify-v3-network
+    environment:
+      POSTGRES_DB: dormify_test
+      POSTGRES_USER: ${TEST_DB_USER:-dormify_user}
+      POSTGRES_PASSWORD: ${TEST_DB_PASSWORD:-dormify_password}
+    ports:
+      # Loopback only. This is a disposable database that never holds real
+      # data, but there is no reason to expose it on other interfaces.
+      # TEST_DB_USER/TEST_DB_PASSWORD may be overridden through an
+      # untracked .env; the defaults keep setup working with no
+      # configuration. Overriding TEST_DB_HOST_PORT away from 5435 will
+      # make the safety check described above reject the connection.
+      - "127.0.0.1:${TEST_DB_HOST_PORT:-5435}:5432"
+    volumes:
+      - test_pgdata:/var/lib/postgresql/data
+
+# ---------------------------------------------------------------------
+# Persistent resources - explicitly named, not project-prefixed
+# ---------------------------------------------------------------------
+# The `name:` field pins the real Docker resource name. Without it these
+# would be created as <project>_<key>, where <project> can be changed from
+# outside this file by COMPOSE_PROJECT_NAME or `-p` - which would allow a
+# renamed project to attach to a different project's volumes. An explicit
+# name makes that impossible.
+networks:
+  dormify-v3-network:
+    name: dormify-v3-network
+
+volumes:
+  dev_pgdata:
+    name: dormify-v3-dev-pgdata
+  test_pgdata:
+    name: dormify-v3-test-pgdata

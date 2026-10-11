@@ -1,0 +1,28 @@
+# Ruff configuration for the Dormify backend.
+#
+# Run from backend/:
+#     pip install -r requirements-dev.txt
+#     ruff check .
+#
+# The rule set is listed explicitly instead of relying on Ruff's defaults,
+# which change between releases: upgrading Ruff must never change what this
+# gate enforces without a reviewed edit here.
+#
+# It covers correctness only. Stylistic rules (line length, import order,
+# quoting, formatting) are deliberately not enabled; adopting any of them is
+# a separate, reviewed change.
+
+# Matches the Python version of the backend image and CI.
+target-version = "py311"
+
+[lint]
+select = [
+    "E9",  # the file cannot be read or parsed
+    "F",   # Pyflakes: undefined names, unused imports and variables, etc.
+]
+
+[lint.per-file-ignores]
+# The api.views compatibility facade exists only to re-export objects from
+# its owner modules. Its surface is locked by the characterization tests, so
+# every import in it is intentionally unused within the module itself.
+"api/views/__init__.py" = ["F401"]

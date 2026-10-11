@@ -1,0 +1,279 @@
+/* Assigned students hierarchy: dorm type -> building -> apartment -> room -> student cards. */
+.hierarchyList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.hierarchyCard {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: white;
+}
+.dormCard { box-shadow: var(--shadow-soft); }
+.buildingCard { border-radius: 16px; }
+.apartmentCard { border-radius: 14px; }
+.roomCard {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: white;
+}
+.hierarchyRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px 17px;
+  border: none;
+  font-family: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.dormRow {
+  border-right: 6px solid var(--blue);
+  background:
+  linear-gradient(
+  135deg,
+  #eaf2ff,
+  #f8fbff
+  );
+}
+[dir="ltr"] .dormRow {
+  border-right: none;
+  border-left: 6px solid var(--blue);
+}
+.buildingRow { background: #f8fbff; }
+.apartmentRow { background: #fbfcfe; }
+.roomRow {
+  padding: 13px 15px;
+  background: white;
+}
+.hierarchyMain {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.chevron {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.80);
+  color: var(--df-color-text-muted);
+}
+[dir="ltr"] .chevron svg { transform: rotate(180deg); }
+.hierarchyIcon {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 12px;
+}
+.dormIcon {
+  background: var(--blue-soft);
+  color: var(--blue);
+}
+.buildingIcon {
+  background: var(--purple-soft);
+  color: var(--purple);
+}
+.apartmentIcon {
+  background: var(--green-soft);
+  color: var(--green);
+}
+.hierarchyTitle {
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 950;
+}
+.hierarchyCounts {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.countChip,
+  .availabilityState {
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 9px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.countChip.assigned {
+  border-color:
+  rgba(37, 99, 235, 0.15);
+  background: var(--blue-soft);
+  color: var(--blue);
+}
+.countChip.available {
+  border-color:
+  rgba(5, 150, 105, 0.15);
+  background: var(--green-soft);
+  color: var(--green);
+}
+.availabilityState.full {
+  border-color:
+  rgba(100, 116, 139, 0.16);
+  background:
+  rgba(100, 116, 139, 0.10);
+  color: var(--df-color-text-muted);
+}
+.availabilityState.available {
+  border-color:
+  rgba(5, 150, 105, 0.17);
+  background: var(--green-soft);
+  color: var(--green);
+}
+.availabilityState.empty {
+  border-color:
+  rgba(217, 119, 6, 0.17);
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+.hierarchyChildren {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  padding-inline-start: 24px;
+  border-top: 1px solid var(--border);
+}
+.dormChildren { background: var(--df-color-surface-muted); }
+.buildingChildren { background: #fbfcfe; }
+.apartmentChildren { background: white; }
+.roomDetails {
+  padding: 14px;
+  border-top: 1px solid var(--border);
+  background: var(--df-color-surface-muted);
+}
+.studentGrid {
+  display: grid;
+  grid-template-columns:
+  repeat(
+  auto-fit,
+  minmax(245px, 1fr)
+  );
+  gap: 10px;
+}
+.studentCard {
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: white;
+  box-shadow:
+  0 5px 14px
+  rgba(15, 23, 42, 0.04);
+}
+.studentCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.studentName {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 950;
+}
+.studentNumber {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+.studentFields {
+  display: grid;
+  grid-template-columns:
+  repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+  color: var(--df-color-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+.studentFields strong { color: var(--df-color-text-secondary); }
+.tableStatus {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 9px;
+  border: 1px solid
+  rgba(5, 150, 105, 0.16);
+  border-radius: 999px;
+  background: var(--green-soft);
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 900;
+}
+.availableBedList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.availableBedChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border: 1px solid
+  rgba(5, 150, 105, 0.16);
+  border-radius: 999px;
+  background: var(--green-soft);
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 900;
+}
+.roomEmptyMessage {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+@media (max-width: 720px) {
+  .hierarchyRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .hierarchyCounts {
+    width: 100%;
+    justify-content: flex-start;
+    padding-inline-start: 38px;
+  }
+  .hierarchyChildren { padding-inline-start: 12px; }
+  .studentFields { grid-template-columns: 1fr; }
+}
+.apartmentTitleRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.apartmentTypeChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 9px;
+  border: 1px solid rgba(124, 58, 237, 0.18);
+  border-radius: 999px;
+  background: var(--purple-soft);
+  color: var(--purple);
+  font-size: 10px;
+  font-weight: 900;
+}

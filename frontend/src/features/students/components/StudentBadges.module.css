@@ -1,0 +1,9 @@
+/* Category pill and date chip shared by the student list rows and the detail hero. */
+.catPill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+.catPill.green { background: #d1fae5; color: #047857; }
+.catPill.blue { background: var(--df-color-primary-tint); color: var(--df-color-primary-strong); }
+.catPill.purple { background: #ede9fe; color: #6d28d9; }
+.catPill.red { background: var(--df-color-danger-soft); color: var(--df-color-danger-strong); }
+.dateChip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: var(--df-color-page-bg); border-radius: 999px; font-size: 12px; color: var(--df-color-text-muted); }
+.dateChip strong { font-weight: 800; color: #1e293b; }
+.dateChip.removedDate { background: var(--df-color-danger-soft); color: var(--df-color-danger-strong); }

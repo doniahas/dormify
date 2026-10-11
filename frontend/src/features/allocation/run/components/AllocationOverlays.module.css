@@ -1,0 +1,241 @@
+/*
+ * The page overlays: toast, confirm modal and the current-result preview
+ * panel. One module so the shared modal chrome (.apModalOverlay, the
+ * ap-modal-in animation) and the per-panel rules keep their cascade.
+ */
+.apStatGreenText { color: var(--ap-green); }
+.apStatAmberText { color: var(--ap-amber); }
+/* ── Empty hint ──────────────────────────── */
+.apEmptyHint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px;
+  color: var(--ap-muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+/* ── Toast ───────────────────────────────── */
+.apToast {
+  position: fixed;
+  top: 16px;
+  inset-inline-end: 16px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 16px;
+  border-radius: var(--ap-radius-sm);
+  font-size: 13.5px;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(15,23,42,0.18);
+  z-index: 300;
+  max-width: 380px;
+  animation: ap-toast-in 0.22s ease;
+}
+@keyframes ap-toast-in {
+  from { transform: translateY(-10px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.apToastSuccess { background: linear-gradient(135deg, #10b981, var(--df-color-success)); color: #fff; }
+.apToastError { background: linear-gradient(135deg, #ef4444, var(--df-color-danger)); color: #fff; }
+.apToastInfo { background: linear-gradient(135deg, #3b82f6, var(--df-color-primary)); color: #fff; }
+.apToastWarning { background: linear-gradient(135deg, #f59e0b, var(--df-color-warning)); color: #fff; }
+.apToastIcon { flex-shrink: 0; }
+.apToastMsg { line-height: 1.4; }
+/* ── Confirm Modal ───────────────────────── */
+.apModalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 16px;
+}
+.apModalBox {
+  background: var(--ap-surface);
+  border-radius: 18px;
+  box-shadow: 0 20px 60px rgba(15,23,42,0.22);
+  padding: 28px;
+  max-width: 420px;
+  width: 100%;
+  animation: ap-modal-in 0.2s ease;
+}
+@keyframes ap-modal-in {
+  from { transform: scale(0.96) translateY(8px); opacity: 0; }
+  to   { transform: scale(1)    translateY(0);   opacity: 1; }
+}
+.apModalTitle {
+  margin: 0 0 10px;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--ap-text);
+}
+.apModalBody {
+  margin: 0 0 22px;
+  font-size: 13.5px;
+  color: var(--ap-text-2);
+  line-height: 1.55;
+  font-weight: 500;
+}
+.apModalActions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.apModalCancel {
+  padding: 9px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--ap-border);
+  background: rgba(15,23,42,0.04);
+  color: var(--ap-text);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.14s;
+}
+.apModalCancel:hover { background: rgba(15,23,42,0.08); }
+.apModalConfirm {
+  padding: 9px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(220,38,38,0.28);
+  background: linear-gradient(135deg, #ef4444, var(--df-color-danger));
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 4px 12px rgba(220,38,38,0.25);
+  transition: filter 0.14s;
+}
+.apModalConfirm:hover { filter: brightness(1.06); }
+/* ── Preview Panel ("תוצאה זמנית") ────────── */
+.apPreviewBox {
+  background: var(--ap-surface);
+  border-radius: 18px;
+  box-shadow: 0 20px 60px rgba(15,23,42,0.22);
+  padding: 24px;
+  max-width: 720px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  animation: ap-modal-in 0.2s ease;
+}
+.apPreviewHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.apPreviewTitle {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ap-text);
+}
+.apPreviewSubtitle {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ap-amber);
+  font-weight: 600;
+}
+.apPreviewClose {
+  background: rgba(15,23,42,0.05);
+  border: none;
+  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--ap-text-2);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.apPreviewClose:hover { background: rgba(15,23,42,0.1); }
+.apPreviewNewerBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  margin: 10px 0;
+  border-radius: var(--ap-radius-sm);
+  background: var(--ap-amber-soft);
+  border: 1px solid var(--ap-amber-border);
+  color: var(--ap-amber);
+  font-size: 13px;
+  font-weight: 700;
+}
+.apPreviewEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 48px 16px;
+  color: var(--ap-muted);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.apPreviewStats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 14px 0;
+}
+.apPreviewStat {
+  text-align: center;
+  padding: 10px 8px;
+  border-radius: var(--ap-radius-sm);
+  background: var(--ap-surface-2);
+  border: 1px solid var(--ap-border);
+}
+.apPreviewStatVal {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ap-text);
+}
+.apPreviewStatLbl {
+  font-size: 11px;
+  color: var(--ap-muted);
+  font-weight: 600;
+  margin-top: 2px;
+}
+.apPreviewTableWrap {
+  overflow-y: auto;
+  border-radius: var(--ap-radius-sm);
+  border: 1px solid var(--ap-border);
+}
+.apPreviewTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.apPreviewTable thead th {
+  position: sticky;
+  top: 0;
+  background: var(--ap-surface-2);
+  text-align: right;
+  padding: 9px 12px;
+  font-weight: 700;
+  color: var(--ap-text-2);
+  border-bottom: 1px solid var(--ap-border);
+}
+.apPreviewTable tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--ap-border);
+  color: var(--ap-text);
+}
+.apPreviewTable tbody tr:last-child td { border-bottom: none; }
+.apPreviewTable tbody tr:hover { background: var(--ap-surface-2); }
+/* ── Spin ────────────────────────────────── */
+.apSpin { animation: ap-spin 0.9s linear infinite; }
+@keyframes ap-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}

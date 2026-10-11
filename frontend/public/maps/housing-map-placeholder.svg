@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1672 941" width="1672" height="941" role="img" aria-labelledby="title desc">
+  <title id="title">Schematic housing map placeholder</title>
+  <desc id="desc">An abstract, repository-owned stand-in for an institutional campus map. The tiles mark where the interactive housing-area overlays sit; the drawing is not to scale and carries no geographic information.</desc>
+  <defs>
+    <pattern id="grid" width="76" height="76" patternUnits="userSpaceOnUse">
+      <path d="M 76 0 L 0 0 0 76" fill="none" stroke="#d6e0ea" stroke-width="1"/>
+    </pattern>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4f8fb"/>
+      <stop offset="1" stop-color="#e9f0f6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- background -->
+  <rect width="1672" height="941" fill="url(#sky)"/>
+  <rect width="1672" height="941" fill="url(#grid)"/>
+
+  <!-- abstract paths between housing areas (no real geometry) -->
+  <g fill="none" stroke="#c3d0dc" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+    <path d="M 120 250 H 1550"/>
+    <path d="M 120 560 H 1550"/>
+    <path d="M 120 790 H 1550"/>
+    <path d="M 420 120 V 850"/>
+    <path d="M 900 120 V 850"/>
+    <path d="M 1320 120 V 850"/>
+  </g>
+
+  <!-- housing-area tiles; positions mirror the overlay hotspots in MapPage -->
+  <g fill="#ffffff" stroke="#9fb3c6" stroke-width="3">
+    <rect x="493" y="146" width="209" height="71" rx="12"/>
+    <rect x="752" y="99" width="167" height="66" rx="12"/>
+    <rect x="920" y="198" width="167" height="71" rx="12"/>
+    <rect x="1204" y="263" width="209" height="71" rx="12"/>
+    <rect x="268" y="419" width="167" height="66" rx="12"/>
+    <rect x="669" y="489" width="201" height="66" rx="12"/>
+    <rect x="1053" y="489" width="192" height="66" rx="12"/>
+    <rect x="1313" y="668" width="167" height="66" rx="12"/>
+  </g>
+  <g fill="#dbe6f0">
+    <rect x="513" y="166" width="40" height="31" rx="4"/><rect x="563" y="166" width="40" height="31" rx="4"/><rect x="613" y="166" width="40" height="31" rx="4"/>
+    <rect x="772" y="117" width="40" height="30" rx="4"/><rect x="822" y="117" width="40" height="30" rx="4"/>
+    <rect x="940" y="218" width="40" height="31" rx="4"/><rect x="990" y="218" width="40" height="31" rx="4"/>
+    <rect x="1224" y="283" width="40" height="31" rx="4"/><rect x="1274" y="283" width="40" height="31" rx="4"/><rect x="1324" y="283" width="40" height="31" rx="4"/>
+    <rect x="288" y="437" width="40" height="30" rx="4"/><rect x="338" y="437" width="40" height="30" rx="4"/>
+    <rect x="689" y="507" width="40" height="30" rx="4"/><rect x="739" y="507" width="40" height="30" rx="4"/><rect x="789" y="507" width="40" height="30" rx="4"/>
+    <rect x="1073" y="507" width="40" height="30" rx="4"/><rect x="1123" y="507" width="40" height="30" rx="4"/><rect x="1173" y="507" width="40" height="30" rx="4"/>
+    <rect x="1333" y="686" width="40" height="30" rx="4"/><rect x="1383" y="686" width="40" height="30" rx="4"/>
+  </g>
+
+  <!-- caption -->
+  <g font-family="Heebo, Arial, sans-serif" fill="#4a5b6c">
+    <text x="60" y="880" font-size="30" font-weight="700">Dormify housing map</text>
+    <text x="60" y="914" font-size="20">Schematic placeholder. Not to scale, not geographically accurate; the institutional map is not part of this repository.</text>
+  </g>
+</svg>
