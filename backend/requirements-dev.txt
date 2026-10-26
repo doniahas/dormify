@@ -20,22 +20,22 @@
 # Python linter - configured in ruff.toml. Ruff has no dependencies.
 # Keep this version equal to the ruff-pre-commit rev in
 # ../.pre-commit-config.yaml so local hooks and CI lint identically.
-ruff==0.16.10
+ruff==0.17.2
 
 # Git hook runner - configured in ../.pre-commit-config.yaml
-pre-commit==4.6.2
+pre-commit==4.7.0
 
 # Resolved dependencies of pre-commit
 cfgv==3.5.0
-distlib==0.4.3
-filelock==4.0.12
+distlib==0.4.4
+filelock==4.2.4
 identify==2.6.20
 nodeenv==1.11.0
 packaging==26.3
-platformdirs==4.12.3
-python-discovery==1.6.1
+platformdirs==4.13.5
+python-discovery==1.6.4
 PyYAML==6.0.3
-virtualenv==21.14.5
+virtualenv==21.14.13
 
 # Dependency vulnerability scanner - run through ../scripts/ci/dependency_audit.py,
 # which audits the runtime graph in constraints.txt, not these tools.
@@ -59,13 +59,13 @@ Pygments==2.21.0
 pyparsing==3.3.3
 rich==15.0.0
 sortedcontainers==2.4.0
-tomli==2.4.1
+tomli==2.5.0
 tomli-w==1.2.0
 typing-extensions==4.16.0
 
 # Shared with the runtime graph - must stay equal to constraints.txt
-certifi==2026.7.22
-charset-normalizer==3.5.1
-idna==3.19
+certifi==2026.10.23
+charset-normalizer==3.5.2
+idna==3.20
 requests==2.34.2
 urllib3==2.8.0
