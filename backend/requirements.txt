@@ -8,7 +8,7 @@
 Django==5.2.17
 
 # Django REST Framework (for API)
-djangorestframework==3.17.2
+djangorestframework==3.18.3
 
 # JWT Authentication
 djangorestframework-simplejwt==5.5.1
@@ -19,15 +19,15 @@ djangorestframework-simplejwt==5.5.1
 django-cors-headers==4.9.0
 
 # Environment Variables
-python-dotenv==1.2.2
+python-dotenv==1.2.4
 
 # Excel file processing
 pandas==2.1.4
 openpyxl==3.1.5
 
-ortools==9.10.4067
+ortools==9.15.6755
 # Password Hashing (included in Django, but listed for clarity)
 bcrypt==4.1.2
 
-psycopg2-binary==2.9.12
+psycopg2-binary==2.9.13
 requests>=2.31,<3
